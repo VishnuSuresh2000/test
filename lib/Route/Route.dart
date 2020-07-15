@@ -1,0 +1,27 @@
+import 'package:beru/UI/Home/BeruHome.dart';
+import 'package:beru/UI/InterNetConectivity/NoInterNet.dart';
+import 'package:beru/UI/Login/checkUserStatus.dart';
+import 'package:flutter/material.dart';
+import 'package:page_transition/page_transition.dart';
+
+
+transitionOnRoute(RouteSettings settings) {
+  switch (settings.name) {
+    case BeruHome.route:
+      return defalutTransition(BeruHome(), settings);
+      break;
+    case CheckUserStatus.route:
+      return defalutTransition(CheckUserStatus(), settings);
+      break;
+    case NoInterNet.route:
+      return defalutTransition(NoInterNet(), settings);
+      break;
+  }
+}
+
+defalutTransition(Widget page, RouteSettings settings) {
+  return PageTransition(
+      child: page,
+      type: PageTransitionType.leftToRightWithFade,
+      settings: settings);
+}

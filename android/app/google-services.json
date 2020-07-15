@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "40755214374",
+    "firebase_url": "https://beru-36801.firebaseio.com",
+    "project_id": "beru-36801",
+    "storage_bucket": "beru-36801.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:40755214374:android:97180abee93eb69c530ee7",
+        "android_client_info": {
+          "package_name": "com.example.beru"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "40755214374-h5l84vt2b5hsmnr650st5ipbjf6fg0ha.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD2JYzjxAY7jywIBIEwPWvJDGqk1Z6OiNc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "40755214374-h5l84vt2b5hsmnr650st5ipbjf6fg0ha.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
