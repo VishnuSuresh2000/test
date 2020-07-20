@@ -1,7 +1,6 @@
 import 'dart:async';
-
 import 'package:beru/Auth/AuthServies.dart';
-import 'package:beru/BLOC/StreamToCheckRegister.dart';
+import 'package:beru/BLOC/CustomeStream/StreamToCheckRegister.dart';
 import 'package:beru/CustomException/BeruException.dart';
 import 'package:beru/Schemas/user.dart';
 import 'package:firebase_auth/firebase_auth.dart';

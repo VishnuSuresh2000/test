@@ -1,4 +1,4 @@
-import 'package:beru/BLOC/userProvider.dart';
+import 'package:beru/BLOC/CustomProviders/userProvider.dart';
 import 'package:beru/UI/CommonFunctions/BeruErrorPage.dart';
 import 'package:beru/UI/CommonFunctions/BeruLodingBar.dart';
 import 'package:beru/UI/CommonFunctions/RouteParmeter.dart';

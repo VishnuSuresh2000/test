@@ -1,4 +1,4 @@
-import 'package:beru/BLOC/userProvider.dart';
+import 'package:beru/BLOC/CustomProviders/userProvider.dart';
 import 'package:beru/REST_Api/ServerApi.dart';
 import 'package:beru/Schemas/user.dart';
 import 'package:beru/UI/CommonFunctions/ErrorAlert.dart';

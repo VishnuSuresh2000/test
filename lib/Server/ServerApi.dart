@@ -1,9 +1,8 @@
 import 'dart:async';
 import 'dart:convert';
-
 import 'package:beru/CustomException/BeruException.dart';
 import 'package:beru/DataStructures/BeruServerError.dart';
-
+import 'package:beru/Schemas/BeruCategory.dart';
 import 'package:beru/Schemas/user.dart';
 import 'package:dio/dio.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -11,6 +10,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 class ServerApi {
   static BaseOptions _options = BaseOptions(
     baseUrl: "http://192.168.43.220:80",
+    connectTimeout: 3000,
   );
   static Dio _client = Dio(_options);
 
@@ -55,8 +55,7 @@ class ServerApi {
       var head = "Bearer ${await tokenForServer()}";
       Response res = await _client
           .get('/customer/checkForExist',
-              options: Options(headers: {"authorization": head}))
-          .timeout(Duration(seconds: 20));
+              options: Options(headers: {"authorization": head}));
       print(res.data);
       return res.data['data'];
     } on NoUserException catch (e) {
@@ -82,8 +81,7 @@ class ServerApi {
       Response res = await _client
           .post('/customer/create',
               data: jsonEncode(user.toMap()),
-              options: Options(headers: {"authorization": head}))
-          .timeout(Duration(seconds: 30));
+              options: Options(headers: {"authorization": head}));
       return res.data['data'];
     } on NoUserException catch (e) {
       print(e.errMsg().toString() + "custom error");
@@ -97,5 +95,22 @@ class ServerApi {
       print(e);
       throw e;
     } finally {}
+  }
+
+  static Future<List<BeruCategory>> serverGetCategory() async {
+    try {
+      Response res = await _client.get('/category/');
+      List temp = res.data['data'];
+      return temp.map((e) => BeruCategory.fromMap(e)).toList();
+      
+    } on DioError catch (e) {
+      print(e.response.data.toString() + "dio error");
+      throw BeruUnKnownError(error: e.response.data.toString());
+    } on TimeoutException {
+      throw BeruServerError();
+    } catch (e) {
+      print(e);
+      throw e;
+    }
   }
 }
