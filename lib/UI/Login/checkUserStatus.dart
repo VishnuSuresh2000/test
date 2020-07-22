@@ -21,21 +21,21 @@ class CheckUserStatus extends StatelessWidget {
         parms ?? ModalRoute.of(context).settings.arguments;
     return Consumer<UserState>(
       builder: (context, value, child) {
-        print("From Consumer ${value.user.userFirbase} ${value.user.userSignUp}");
-        if (value == null || value.user.userFirbase == null) {
+        print("From Consumer ${value.userFirbase} ${value.userSignUp}");
+        if (value == null || value.userFirbase == null) {
           return BeruLoadingBar();
-        } else if (!value.user.userFirbase &&
-            !(value.user.userSignUp ?? false)) {
+        } else if (!value.userFirbase &&
+            !(value.userSignUp ?? false)) {
           return BeruLogin();
-        } else if (value.user.userSignUp == null) {
+        } else if (value.userSignUp == null) {
           return BeruLoadingBar();
-        } else if (value.user.userFirbase && !value.user.userSignUp) {
+        } else if (value.userFirbase && !value.userSignUp) {
           return BeruSignUp();
-        } else if (value.user.userFirbase && value.user.userSignUp) {
+        } else if (value.userFirbase && value.userSignUp) {
           return test.child;
-        } else if (value.user.serverError) {
+        } else if (value.serverError) {
           return BeruErrorPage(
-            errMsg: value.user.error.toString(),
+            errMsg: value.error.toString(),
           );
         } else {
           return BeruLoadingBar();

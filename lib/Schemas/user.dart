@@ -8,13 +8,11 @@ class User {
   Address address;
   String _id;
   bool sex;
-  bool userFirbase;
-  bool userSignUp;
-  bool userStatus; //true siginin, false sigin out
-  bool serverError=false;
-  Exception error;
+  
+
+
   String get fullName {
-    return "$firstName $lastName";
+    return "$firstName ${lastName??""}";
   }
 
   String get id {
@@ -27,12 +25,22 @@ class User {
 
   User();
   User.fromMap(Map<String, dynamic> data) {
-    this.firstName = data['firstName'];
-    this.lastName = data['lastName'];
-    this.phoneNumber = data['phoneNumber'];
-    this.sex = data['sex'];
-    this.address = Address.fromMap(data['address']);
-    this.email = data['email'];
+    this.firstName = data['firstName'] ?? null;
+    this.lastName = data['lastName'] ?? null;
+    this.phoneNumber = data['phoneNumber'] ?? null;
+    this.sex = data['sex'] ?? null;
+    this.address =
+        data['address'] == null ? null : Address.fromMap(data['address']);
+    this.email = data['email']??null;
+  }
+  User.fromMapTest(Map<String, dynamic> data) {
+    this.firstName = data['name'] ?? null;
+    this.lastName = data['lastName'] ?? null;
+    this.phoneNumber = data['phoneNumber'] ?? null;
+    this.sex = data['sex'] ?? null;
+    this.address =
+        data['address'] == null ? null : Address.fromMap(data['address']);
+    this.email = data['email']??null;
   }
 
   Map<String, dynamic> toMap() {

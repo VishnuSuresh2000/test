@@ -1,7 +1,8 @@
 import 'dart:async';
 import 'package:beru/CustomException/BeruException.dart';
-import 'package:beru/REST_Api/ServerApi.dart';
 import 'package:beru/Schemas/BeruCategory.dart';
+import 'package:beru/Server/ServerApi.dart';
+import 'package:beru/Server/ServerWebSocket.dart';
 import 'package:flutter/material.dart';
 
 class StreamOutCategory {
@@ -16,19 +17,25 @@ class StreamOutCategory {
 class BlocForCategory extends ChangeNotifier {
   StreamOutCategory data = StreamOutCategory();
   Timer syncServer;
-  int delay = 5;
+  int delay = 30;
 
   BlocForCategory() : super() {
     setData();
-    initTimer();
+    webSocketControl();
   }
 
   void setData() async {
     try {
       data.list = await ServerApi.serverGetCategory();
       data.isError = false;
+
+      if (syncServer != null &&
+          syncServer.isActive != null &&
+          (syncServer.isActive ?? false)) {
+        disposeTimer();
+      }
     } catch (e) {
-      print(e);
+      print("From setData error $e");
       if (data.loading) {
         data.isError = true;
       }
@@ -36,11 +43,28 @@ class BlocForCategory extends ChangeNotifier {
     } finally {
       data.loading = false;
       notifyListeners();
-      if (!data.isError) {
-        disposeTimer();
-        delay = 1000;
+      if (data.isError && syncServer == null) {
         initTimer();
       }
+    }
+  }
+
+  void webSocketControl() {
+    try {
+      Stream stream = serverSocket('category');
+      stream.listen((event) {
+        if (event == "true") {
+          setData();
+        }
+      }, onError: (error) {
+        print("From lisenetr error $error");
+      }, onDone: () {
+        print("canceled the Stream in Listern");
+        webSocketControl();
+      });
+    } catch (e) {
+      print("From ouside error $e");
+      webSocketControl();
     }
   }
 

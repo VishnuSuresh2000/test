@@ -6,7 +6,6 @@ import 'package:beru/UI/CommonFunctions/BeruLodingBar.dart';
 import 'package:beru/UI/InterNetConectivity/CheckConnectivity.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:web_socket_channel/io.dart';
 
 class BeruHome extends StatefulWidget {
   static const String route = '/BeruHome';
@@ -16,18 +15,6 @@ class BeruHome extends StatefulWidget {
 
 class _BeruHomeState extends State<BeruHome> with TickerProviderStateMixin {
   int index = 0;
-
-  @override
-  void initState() {
-    super.initState();
-    var channel =
-        IOWebSocketChannel.connect("ws://beru-server.herokuapp.com/test");
-    channel.stream.listen((event) {
-      print("data from WS ${event.toString()}");
-    }, onError: (error) {
-      print(error);
-    });
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -51,8 +38,15 @@ class _BeruHomeState extends State<BeruHome> with TickerProviderStateMixin {
   }
 
   Scaffold body(BuildContext context, List<BeruCategory> items) {
-    TabController tabController =
-        TabController(length: items.length, vsync: this, initialIndex: index);
+    TabController tabController;
+    try {
+      tabController =
+          TabController(length: items.length, vsync: this, initialIndex: index);
+    } catch (e) {
+      print("Error from tab controller init $e");
+      tabController =
+          TabController(length: items.length, vsync: this, initialIndex: 0);
+    }
     tabController.addListener(() {
       index = tabController.index;
     });

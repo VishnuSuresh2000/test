@@ -1,6 +1,6 @@
 import 'package:beru/BLOC/CustomProviders/userProvider.dart';
-import 'package:beru/REST_Api/ServerApi.dart';
 import 'package:beru/Schemas/user.dart';
+import 'package:beru/Server/ServerApi.dart';
 import 'package:beru/UI/CommonFunctions/ErrorAlert.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';

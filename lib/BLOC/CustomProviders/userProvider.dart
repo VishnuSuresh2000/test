@@ -12,6 +12,12 @@ class UserState extends ChangeNotifier {
   StreamSubscription<bool> serverSignUpSbub;
   StreamSubscription<FirebaseUser> firebaseSignUpSbub;
 
+  bool userFirbase;
+  bool userSignUp;
+  bool userStatus; //true siginin, false sigin out
+  bool serverError = false;
+  Exception error;
+
   UserState() : super() {
     autoUserStatusCheck();
     checkUserInServer();
@@ -23,21 +29,21 @@ class UserState extends ChangeNotifier {
         FirebaseAuth.instance.onAuthStateChanged.listen((event) async {
       print("from Firebase lstener $event");
       if (event != null) {
-        _user.userFirbase = true;
+        userFirbase = true;
         print("FireBase User");
         serverSignUpSbub.resume();
         firebaseSignUpSbub.pause();
       } else {
-        _user.userFirbase = false;
+        userFirbase = false;
         print("No FireBase User from firebase instance");
       }
-      print(" from stream ${_user.userFirbase} ${_user.userSignUp}");
+      print(" from stream $userFirbase $userSignUp");
       setUserStatus();
       notifyListeners();
     }, onError: (error) {
       print(error);
-      _user.serverError = true;
-      _user.error = BeruFirebaseError();
+      serverError = true;
+      error = BeruFirebaseError();
       setUserStatus();
       notifyListeners();
     });
@@ -46,7 +52,7 @@ class UserState extends ChangeNotifier {
   void checkUserInServer() {
     serverSignUpSbub = register.stream.listen((event) {
       print("from lisenter SignUp Server $event");
-      _user.userSignUp = event;
+      userSignUp = event;
       if (event) {
         print("paused stream sighnUp");
         serverSignUpSbub.pause();
@@ -55,11 +61,11 @@ class UserState extends ChangeNotifier {
       notifyListeners();
     }, onError: (error) {
       if (error is BeruServerError) {
-        _user.serverError = true;
-        _user.error = BeruServerError();
+        serverError = true;
+        error = BeruServerError();
       } else {
-        _user.serverError = true;
-        _user.error = error;
+        serverError = true;
+        error = error;
       }
       setUserStatus();
       notifyListeners();
@@ -67,8 +73,8 @@ class UserState extends ChangeNotifier {
   }
 
   void setUserStatus() {
-    _user.userStatus =
-        (_user.userFirbase ?? false) && (_user.userSignUp ?? false);
+    userStatus =
+        (userFirbase ?? false) && (userSignUp ?? false);
     notifyListeners();
   }
 
@@ -94,30 +100,28 @@ class UserState extends ChangeNotifier {
   }
 
   set siginInFirbase(bool value) {
-    user.userFirbase = value;
+    userFirbase = value;
     serverSignUpSbub.resume();
     notifyListeners();
   }
 
   set siginUpServer(bool value) {
     serverSignUpSbub.pause();
-    user.userSignUp = value;
+    userSignUp = value;
     setUserStatus();
     notifyListeners();
   }
 
-  bool get userStatus {
-    return user.userStatus;
-  }
+  
 
   void signOut() {
     bool value = false;
     AuthServies.signOut();
     serverSignUpSbub.pause();
     firebaseSignUpSbub.resume();
-    user.userStatus = value;
-    user.userFirbase = value;
-    user.userSignUp = null;
+    userStatus = value;
+    userFirbase = value;
+    userSignUp = null;
     notifyListeners();
   }
 }
