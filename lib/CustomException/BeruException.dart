@@ -1,5 +1,3 @@
-
-
 class NoUserException implements Exception {
   String errMsg() => "No User Dectected Login";
 }
@@ -21,4 +19,8 @@ class BeruUnKnownError implements Exception {
   final String error;
   BeruUnKnownError({this.error});
   String toString() => error;
+}
+
+class BeruNoProductForSalles implements Exception {
+  String toString() => "No Product Is Available For this Category";
 }

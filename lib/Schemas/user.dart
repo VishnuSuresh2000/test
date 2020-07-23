@@ -9,8 +9,6 @@ class User {
   String _id;
   bool sex;
   
-
-
   String get fullName {
     return "$firstName ${lastName??""}";
   }
@@ -45,12 +43,12 @@ class User {
 
   Map<String, dynamic> toMap() {
     return {
-      'firstName': this.firstName,
-      'lastName': this.lastName,
-      'phoneNumber': this.phoneNumber,
-      'sex': this.sex,
-      'address': this.address.toMap(),
-      'email': this.email
+      'firstName': this.firstName??null,
+      'lastName': this.lastName??null,
+      'phoneNumber': this.phoneNumber??null,
+      'sex': this.sex??null,
+      'address': this.address==null?null:this.address.toMap(),
+      'email': this.email??null
     };
   }
 }

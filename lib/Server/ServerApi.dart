@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:beru/CustomException/BeruException.dart';
 import 'package:beru/DataStructures/BeruServerError.dart';
 import 'package:beru/Schemas/BeruCategory.dart';
+import 'package:beru/Schemas/Product.dart';
 import 'package:beru/Schemas/user.dart';
 import 'package:dio/dio.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -44,7 +45,7 @@ class ServerApi {
     } on NoUserException catch (e) {
       print(e.errMsg().toString() + "custom error");
     } on DioError catch (e) {
-      print(e.response.data.toString() + "dio error");
+      print(e.response.data['data'].toString() + "dio error");
     } catch (e) {
       print(e);
     } finally {}
@@ -53,9 +54,8 @@ class ServerApi {
   static Future<bool> serverCheckIfExist() async {
     try {
       var head = "Bearer ${await tokenForServer()}";
-      Response res = await _client
-          .get('/customer/checkForExist',
-              options: Options(headers: {"authorization": head}));
+      Response res = await _client.get('/customer/checkForExist',
+          options: Options(headers: {"authorization": head}));
       print(res.data);
       return res.data['data'];
     } on NoUserException catch (e) {
@@ -78,16 +78,15 @@ class ServerApi {
     try {
       print(user.toMap());
       var head = "Bearer ${await tokenForServer()}";
-      Response res = await _client
-          .post('/customer/create',
-              data: jsonEncode(user.toMap()),
-              options: Options(headers: {"authorization": head}));
+      Response res = await _client.post('/customer/create',
+          data: jsonEncode(user.toMap()),
+          options: Options(headers: {"authorization": head}));
       return res.data['data'];
     } on NoUserException catch (e) {
       print(e.errMsg().toString() + "custom error");
       throw e;
     } on DioError catch (e) {
-      print(e.response.data.toString() + "dio error");
+      print(e.response.data['data'].toString() + "dio error");
       throw e;
     } on TimeoutException {
       throw BeruServerError();
@@ -102,10 +101,31 @@ class ServerApi {
       Response res = await _client.get('/category/');
       List temp = res.data['data'];
       return temp.map((e) => BeruCategory.fromMap(e)).toList();
-      
     } on DioError catch (e) {
-      print(e.response.data.toString() + "dio error");
-      throw BeruUnKnownError(error: e.response.data.toString());
+      print(e.response.data['data'].toString() + "dio error");
+      throw BeruUnKnownError(error: e.response.data['data'].toString());
+    } on TimeoutException {
+      throw BeruServerError();
+    } catch (e) {
+      print(e);
+      throw e;
+    }
+  }
+
+  static Future<List<Product>> serverGetSallesProductByCategory(
+      String category) async {
+    try {
+      Response res =
+          await _client.get('/salles/getProductByCategory/$category');
+      List data = res.data['data'];
+      return data.map((e) => Product.fromMap(e)).toList();
+    } on DioError catch (e) {
+      if (e.response.data['data'] ==
+          BeruServerErrorStrings.noProductForSalles) {
+        throw BeruNoProductForSalles();
+      } else {
+        throw BeruUnKnownError(error: e.response.data['data'].toString());
+      }
     } on TimeoutException {
       throw BeruServerError();
     } catch (e) {

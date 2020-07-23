@@ -16,7 +16,7 @@ class MyApp extends StatelessWidget {
       providers: bloc,
       child: MaterialApp(
         theme: defaultTheme,
-        onGenerateRoute: (settings) =>transitionOnRoute(settings),
+        onGenerateRoute: (settings) => transitionOnRoute(settings),
         debugShowCheckedModeBanner: false,
         home: BeruHome(),
       ),

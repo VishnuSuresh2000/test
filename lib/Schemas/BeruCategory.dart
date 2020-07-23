@@ -1,7 +1,7 @@
 class BeruCategory {
   String _id;
   String name;
-  
+
   String get id {
     return _id;
   }
@@ -12,8 +12,8 @@ class BeruCategory {
 
   BeruCategory();
   BeruCategory.fromMap(Map<String, dynamic> data) {
-    this._id = data['_id'];
-    this.name = data['name'];
+    this._id = data['_id'] ?? null;
+    this.name = data['name'] ?? null;
   }
 
   Map<String, dynamic> toMap() {
