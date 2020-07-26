@@ -5,7 +5,7 @@ class Salles {
   User seller;
   User farmer;
   int count;
-  int amount;
+  
 
   String get id {
     return this._id;
@@ -20,7 +20,7 @@ class Salles {
     this.seller =
         temp['seller_id'] == null ? null : User.fromMapTest(temp['seller_id']);
     this.count = temp['count'];
-    this.amount = temp['amount'];
+    
   }
 
   Map<String, dynamic> toMap() {
@@ -29,7 +29,7 @@ class Salles {
       'farmer_id': farmer.toMap(),
       'seller_id': seller.toMap(),
       'count': count,
-      'amount': amount
+      
     };
   }
 

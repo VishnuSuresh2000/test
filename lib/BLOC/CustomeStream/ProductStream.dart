@@ -44,14 +44,16 @@ class ProductSallesStream {
       error = e;
       _controller.sink.addError(e);
     } catch (e) {
-      if (dataOrError == null) {
-        dataOrError = false;
-        error = BeruNoProductForSalles();
-        _controller.sink.addError(error);
-      }
-      print("Error from Product ${e.toString()}");
+      // if (dataOrError == null) {
+      //   dataOrError = true;
+      //   error = BeruNoProductForSalles();
+      //   _controller.sink.addError(error);
+      // }
+      dataOrError = false;
+      error = e;
+      print("Error from Product stream ${e.toString()}");
     } finally {
-      if (!dataOrError) {
+      if (!dataOrError && !(error is BeruNoProductForSalles)) {
         getDataFromServer();
       }
     }

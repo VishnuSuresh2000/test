@@ -21,11 +21,11 @@ class CheckUserStatus extends StatelessWidget {
         parms ?? ModalRoute.of(context).settings.arguments;
     return Consumer<UserState>(
       builder: (context, value, child) {
-        print("From Consumer ${value.userFirbase} ${value.userSignUp}");
+        print(
+            "User Status firebase ${value.userFirbase} server ${value.userSignUp} ");
         if (value == null || value.userFirbase == null) {
           return BeruLoadingBar();
-        } else if (!value.userFirbase &&
-            !(value.userSignUp ?? false)) {
+        } else if (!value.userFirbase && !(value.userSignUp ?? false)) {
           return BeruLogin();
         } else if (value.userSignUp == null) {
           return BeruLoadingBar();

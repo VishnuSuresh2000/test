@@ -6,7 +6,6 @@ StreamBuilder<ConnectivityResult> checkInterNet(Widget child) {
   return StreamBuilder<ConnectivityResult>(
     stream: Connectivity().onConnectivityChanged,
     builder: (context, snapshot) {
-      print(snapshot.data);
       switch (snapshot.data) {
         case ConnectivityResult.none:
           return NoInterNet();

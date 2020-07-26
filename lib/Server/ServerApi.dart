@@ -9,8 +9,11 @@ import 'package:dio/dio.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 class ServerApi {
+  static bool offlineOnline=true;
+  static String dns = offlineOnline ? "192.168.43.220:80" : "beru-server.herokuapp.com";
+  static String url=offlineOnline?"http://$dns":"https://$dns";
   static BaseOptions _options = BaseOptions(
-    baseUrl: "http://192.168.43.220:80",
+    baseUrl:url,
     connectTimeout: 3000,
   );
   static Dio _client = Dio(_options);
@@ -25,44 +28,18 @@ class ServerApi {
     }
   }
 
-  // static test() async {
-  //   FirebaseUser user = await FirebaseAuth.instance.currentUser();
-  //   var token = await user.getIdToken();
-  //   print(token.token);
-  //   Response res = await _client.get('/customer/test/',
-  //       options: Options(headers: {"authorization": "Bearer ${token.token}"}));
-  //   print(res);
-  // }
-
-  static void serverGet() async {
-    try {
-      // var head = "Bearer ${await tokenForServer()}";
-      Response res = await _client.get(
-        '/customer/create',
-        // options: Options(headers: {"authorization": head})
-      );
-      print(res.data);
-    } on NoUserException catch (e) {
-      print(e.errMsg().toString() + "custom error");
-    } on DioError catch (e) {
-      print(e.response.data['data'].toString() + "dio error");
-    } catch (e) {
-      print(e);
-    } finally {}
-  }
 
   static Future<bool> serverCheckIfExist() async {
     try {
       var head = "Bearer ${await tokenForServer()}";
       Response res = await _client.get('/customer/checkForExist',
           options: Options(headers: {"authorization": head}));
-      print(res.data);
       return res.data['data'];
     } on NoUserException catch (e) {
       print(e.errMsg().toString() + "custom error");
       throw e;
     } on DioError catch (e) {
-      print(e.response.data['data'].toString() + "dio error");
+      print(e.response.data.toString() + "dio error");
       if (e.response.data['data'] == BeruServerErrorStrings.userMustSignUp) {
         throw SighUpNotComplete();
       } else {

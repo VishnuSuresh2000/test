@@ -1,11 +1,15 @@
 import 'package:beru/BLOC/CustomProviders/BLOCForCategory.dart';
+import 'package:beru/BLOC/CustomProviders/userProvider.dart';
 import 'package:beru/BLOC/CustomeStream/ProductStream.dart';
+import 'package:beru/CustomFunctions/BeruString.dart';
 import 'package:beru/Responsive/CustomRatio.dart';
 import 'package:beru/Schemas/BeruCategory.dart';
 import 'package:beru/Schemas/Product.dart';
 import 'package:beru/Schemas/Salles.dart';
+import 'package:beru/Server/ServerApi.dart';
 import 'package:beru/UI/CommonFunctions/BeruErrorPage.dart';
 import 'package:beru/UI/CommonFunctions/BeruLodingBar.dart';
+import 'package:beru/UI/Home/ProductShowAlert.dart';
 import 'package:beru/UI/InterNetConectivity/CheckConnectivity.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -18,7 +22,7 @@ class BeruHome extends StatefulWidget {
 
 class _BeruHomeState extends State<BeruHome> with TickerProviderStateMixin {
   int index = 0;
-
+  List<ProductSallesStream> streams = [];
   @override
   Widget build(BuildContext context) {
     return checkInterNet(getCategory(context));
@@ -53,72 +57,78 @@ class _BeruHomeState extends State<BeruHome> with TickerProviderStateMixin {
     tabController.addListener(() {
       index = tabController.index;
     });
-    List<Stream<List<Product>>> streams = [];
+
     return Scaffold(
+        floatingActionButton: FloatingActionButton(
+          onPressed: () =>Provider.of<UserState>(context,listen: false).signOut(),
+          child: Text("Out"),
+        ),
         body: NestedScrollView(
-      headerSliverBuilder: (context, innerBoxIsScrolled) {
-        return <Widget>[
-          SliverAppBar(
-            leading: Icon(
-              Icons.menu,
-            ),
-            actions: <Widget>[
-              Padding(
-                padding: EdgeInsets.only(
-                    right: ResponsiveRatio.getWigth(10, context)),
-                child: Icon(
-                  Icons.notifications,
-                  color: Color(0xff545d68),
+          headerSliverBuilder: (context, innerBoxIsScrolled) {
+            return <Widget>[
+              SliverAppBar(
+                leading: Icon(
+                  Icons.menu,
                 ),
-              ),
-            ],
-            centerTitle: true,
-            pinned: true,
-            expandedHeight: ResponsiveRatio.getHight(180, context),
-            flexibleSpace: FlexibleSpaceBar(
-              collapseMode: CollapseMode.none,
-              titlePadding: EdgeInsets.only(
-                  top: ResponsiveRatio.getHight(100, context),
-                  bottom: ResponsiveRatio.getHight(60, context),
-                  left: ResponsiveRatio.getWigth(20, context)),
-              title: Text(
-                "Categories",
-                style: TextStyle(
-                  fontFamily: 'SourceSansPro',
-                  fontSize: 30.0,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.black,
+                actions: <Widget>[
+                  Padding(
+                    padding: EdgeInsets.only(
+                        right: ResponsiveRatio.getWigth(10, context)),
+                    child: Icon(
+                      Icons.notifications,
+                    ),
+                  ),
+                ],
+                centerTitle: true,
+                pinned: true,
+                expandedHeight: ResponsiveRatio.getHight(180, context),
+                flexibleSpace: FlexibleSpaceBar(
+                  collapseMode: CollapseMode.none,
+                  titlePadding: EdgeInsets.only(
+                      top: ResponsiveRatio.getHight(100, context),
+                      bottom: ResponsiveRatio.getHight(60, context),
+                      left: ResponsiveRatio.getWigth(20, context)),
+                  title: Text(
+                    "Categories",
+                    style: Theme.of(context).textTheme.headline2,
+                  ),
                 ),
-              ),
-            ),
-            title: Text("Beru"),
-            bottom: TabBar(
-                indicatorColor: Colors.transparent,
-                controller: tabController,
-                tabs: items
-                    .map((e) => Tab(
-                          text: "${e.name.toString().toUpperCase()}",
-                        ))
-                    .toList()),
-          )
-        ];
-      },
-      body: tabBarViewHome(items, streams, tabController),
-    ));
+                title: Text("Beru"),
+                bottom: TabBar(
+                    indicatorColor: Colors.transparent,
+                    controller: tabController,
+                    tabs: items
+                        .map((e) => Tab(
+                              text: "${e.name.toString().toUpperCase()}",
+                            ))
+                        .toList()),
+              )
+            ];
+          },
+          body: tabBarViewHome(items, tabController),
+        ));
   }
 
-  TabBarView tabBarViewHome(List<BeruCategory> items,
-      List<Stream<List<Product>>> streams, TabController tabController) {
+  TabBarView tabBarViewHome(
+      List<BeruCategory> items, TabController tabController) {
     return TabBarView(
       children: items.map((e) {
-        var stream = ProductSallesStream(category: e).stream;
+        var stream = ProductSallesStream(category: e);
         streams.add(stream);
         return ShowProductOnSalles(
-          stream: stream,
+          stream: stream.stream,
         );
       }).toList(),
       controller: tabController,
     );
+  }
+
+  @override
+  void dispose() {
+    streams.forEach((element) {
+      element.dispose();
+    });
+    super.dispose();
   }
 }
 
@@ -187,33 +197,7 @@ class ShowProductOnSalles extends StatelessWidget {
             SizedBox.fromSize(
               size: Size.fromHeight(ResponsiveRatio.getHight(10, context)),
             ),
-            Container(
-              height: ResponsiveRatio.getHight(75, context),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                image: DecorationImage(
-                    image: AssetImage(
-                      "assets/images/apple.jpg",
-                    ),
-                    fit: BoxFit.contain),
-              ),
-            ),
-            Text(
-              "\₹ ${product.salles[select].amount}",
-              style: TextStyle(
-                color: Color(0xffcc8053),
-                fontFamily: 'SourceSansPro',
-                fontSize: 18.0,
-              ),
-            ),
-            Text(
-              "${product.name}",
-              style: TextStyle(
-                color: Colors.green,
-                fontFamily: 'SourceSansPro',
-                fontSize: 20.0,
-              ),
-            ),
+            ...showProucts(product, context),
             Padding(
               padding: EdgeInsets.all(ResponsiveRatio.getHight(10, context)),
               child: Container(
@@ -235,13 +219,8 @@ class ShowProductOnSalles extends StatelessWidget {
                 );
               },
               elevation: 0,
-              color: Colors.white,
-              child: Text("Buy Now",
-                  style: TextStyle(
-                    color: Colors.redAccent,
-                    fontFamily: 'SourceSansPro',
-                    fontSize: 20.0,
-                  )),
+              child:
+                  Text("Buy Now", style: Theme.of(context).textTheme.subtitle1),
             ),
             SizedBox.fromSize(
               size: Size.fromHeight(ResponsiveRatio.getHight(5, context)),
@@ -254,139 +233,27 @@ class ShowProductOnSalles extends StatelessWidget {
   }
 }
 
-class ProductShowAlert extends StatefulWidget {
-  ProductShowAlert({
-    Key key,
-    this.sallesProduct,
-    this.product,
-  }) : super(key: key);
-
-  Salles sallesProduct;
-  Product product;
-
-  @override
-  _ProductShowAlertState createState() => _ProductShowAlertState();
-}
-
-class _ProductShowAlertState extends State<ProductShowAlert> {
-  @override
-  Widget build(BuildContext context) {
-    return AlertDialog(
-      content: Container(
-        height: ResponsiveRatio.getHight(340, context),
-        child: Column(
-          children: [
-            Container(
-              height: ResponsiveRatio.getHight(75, context),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                image: DecorationImage(
-                    image: AssetImage(
-                      "assets/images/apple.jpg",
-                    ),
-                    fit: BoxFit.contain),
-              ),
-            ),
-            Text(
-              "\₹ ${widget.sallesProduct.amount}",
-              style: TextStyle(
-                color: Color(0xffcc8053),
-                fontFamily: 'SourceSansPro',
-                fontSize: 18.0,
-              ),
-            ),
-            Text(
-              "${widget.product.name}",
-              style: TextStyle(
-                color: Colors.green,
-                fontFamily: 'SourceSansPro',
-                fontSize: 20.0,
-              ),
-            ),
-            Padding(
-              padding: EdgeInsets.all(ResponsiveRatio.getHight(10, context)),
-              child: Container(
-                color: Color(0xffebebeb),
-                height: 2.0,
-              ),
-            ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text("Seller :",
-                    style: TextStyle(
-                      color: Colors.blueAccent,
-                      fontFamily: 'SourceSansPro',
-                      fontSize: 20.0,
-                    )),
-                DropdownButton(
-                    style: TextStyle(
-                      color: Colors.green,
-                      fontFamily: 'SourceSansPro',
-                      fontSize: 20.0,
-                    ),
-                    value: widget.sallesProduct,
-                    hint: Text("Sallers"),
-                    items: widget.product.salles
-                        .map((e) => DropdownMenuItem<Salles>(
-                            value: e, child: Text("${e.seller.fullName}")))
-                        .toList(),
-                    onChanged: (value) {
-                      widget.sallesProduct = value;
-                      setState(() {});
-                    }),
-              ],
-            ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-              Text("Farmer :",
-                    style: TextStyle(
-                      color: Colors.blueAccent,
-                      fontFamily: 'SourceSansPro',
-                      fontSize: 20.0,
-                    )),
-                    Text("${widget.sallesProduct.farmer.fullName}",
-                    style: TextStyle(
-                      color: Colors.green,
-                      fontFamily: 'SourceSansPro',
-                      fontSize: 20.0,
-                    )),
-            ],),
-            SizedBox.fromSize(
-              size: Size.fromHeight(20),
-            ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                RaisedButton(
-                  onPressed: () => Navigator.pop(context),
-                  child: Text("Cancel",
-                      style: TextStyle(
-                        color: Colors.blueAccent,
-                        fontFamily: 'SourceSansPro',
-                        fontSize: 20.0,
-                      )),
-                  elevation: 0,
-                  color: Colors.white,
-                ),
-                RaisedButton(
-                  onPressed: () {},
-                  elevation: 0,
-                  color: Colors.white,
-                  child: Text("Cart",
-                      style: TextStyle(
-                        color: Colors.redAccent,
-                        fontFamily: 'SourceSansPro',
-                        fontSize: 20.0,
-                      )),
-                ),
-              ],
-            )
-          ],
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
+List<Widget> showProucts(Product product, BuildContext context) {
+  return [
+    Container(
+      height: ResponsiveRatio.getHight(75, context),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        image: DecorationImage(
+          image: product.hasImg
+              ? NetworkImage(
+                  "${ServerApi.url}/product/getImage/${product.name}")
+              : AssetImage('assets/images/NoImg.png'),
         ),
       ),
-    );
-  }
+    ),
+    Text(
+      "\₹ ${product.amount}",
+      style: Theme.of(context).textTheme.caption,
+    ),
+    Text(
+      "${firstToUpperCaseString(product.name)}",
+      style: Theme.of(context).textTheme.subtitle2,
+    )
+  ];
 }

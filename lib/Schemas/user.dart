@@ -1,3 +1,4 @@
+import 'package:beru/CustomFunctions/BeruString.dart';
 import 'package:beru/Schemas/address.dart';
 
 class User {
@@ -8,9 +9,9 @@ class User {
   Address address;
   String _id;
   bool sex;
-  
+
   String get fullName {
-    return "$firstName ${lastName??""}";
+    return "${firstToUpperCaseString(firstName)} ${firstToUpperCaseString(lastName ?? "")}";
   }
 
   String get id {
@@ -29,26 +30,26 @@ class User {
     this.sex = data['sex'] ?? null;
     this.address =
         data['address'] == null ? null : Address.fromMap(data['address']);
-    this.email = data['email']??null;
+    this.email = data['email'] ?? null;
   }
   User.fromMapTest(Map<String, dynamic> data) {
-    this.firstName = data['name'] ?? null;
+    this.firstName = data['firstName'] ?? null;
     this.lastName = data['lastName'] ?? null;
     this.phoneNumber = data['phoneNumber'] ?? null;
     this.sex = data['sex'] ?? null;
     this.address =
         data['address'] == null ? null : Address.fromMap(data['address']);
-    this.email = data['email']??null;
+    this.email = data['email'] ?? null;
   }
 
   Map<String, dynamic> toMap() {
     return {
-      'firstName': this.firstName??null,
-      'lastName': this.lastName??null,
-      'phoneNumber': this.phoneNumber??null,
-      'sex': this.sex??null,
-      'address': this.address==null?null:this.address.toMap(),
-      'email': this.email??null
+      'firstName': this.firstName ?? null,
+      'lastName': this.lastName ?? null,
+      'phoneNumber': this.phoneNumber ?? null,
+      'sex': this.sex ?? null,
+      'address': this.address == null ? null : this.address.toMap(),
+      'email': this.email ?? null
     };
   }
 }

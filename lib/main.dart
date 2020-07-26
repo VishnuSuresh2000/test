@@ -1,7 +1,11 @@
 import 'package:beru/BLOC/BlocList.dart';
 import 'package:beru/Route/Route.dart';
 import 'package:beru/Theme/DefaultTheme.dart';
+import 'package:beru/UI/CommonFunctions/RouteParmeter.dart';
 import 'package:beru/UI/Home/BeruHome.dart';
+import 'package:beru/UI/InterNetConectivity/InitalNetWorkCheck.dart';
+import 'package:beru/UI/Login/checkUserStatus.dart';
+import 'package:beru/UI/Login/loginPage.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -18,7 +22,7 @@ class MyApp extends StatelessWidget {
         theme: defaultTheme,
         onGenerateRoute: (settings) => transitionOnRoute(settings),
         debugShowCheckedModeBanner: false,
-        home: BeruHome(),
+        home: InitalNetWorkCheck(),
       ),
     );
   }

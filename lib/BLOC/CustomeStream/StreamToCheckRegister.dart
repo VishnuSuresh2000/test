@@ -16,17 +16,17 @@ class BeruRegister {
 
   void timerSetUp() {
     timer = Timer.periodic(Duration(seconds: 5), (timer) async {
-      print("In Stream register Status in SignUp");
+
       try {
         var user = await FirebaseAuth.instance.currentUser();
         if (user != null) {
           if (await ServerApi.serverCheckIfExist()) {
-            print("registed in server from Stream");
+    
             registerController.sink.add(true);
             timer.cancel();
           }
         } else if (user == null) {
-          print("No Firbase User");
+     
           registerController.sink.add(false);
         }
       } on SighUpNotComplete {

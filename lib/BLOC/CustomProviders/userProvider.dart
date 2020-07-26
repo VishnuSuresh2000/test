@@ -27,17 +27,15 @@ class UserState extends ChangeNotifier {
   void autoUserStatusCheck() {
     firebaseSignUpSbub =
         FirebaseAuth.instance.onAuthStateChanged.listen((event) async {
-      print("from Firebase lstener $event");
       if (event != null) {
         userFirbase = true;
-        print("FireBase User");
+
         serverSignUpSbub.resume();
         firebaseSignUpSbub.pause();
       } else {
         userFirbase = false;
-        print("No FireBase User from firebase instance");
       }
-      print(" from stream $userFirbase $userSignUp");
+
       setUserStatus();
       notifyListeners();
     }, onError: (error) {
@@ -51,10 +49,8 @@ class UserState extends ChangeNotifier {
 
   void checkUserInServer() {
     serverSignUpSbub = register.stream.listen((event) {
-      print("from lisenter SignUp Server $event");
       userSignUp = event;
       if (event) {
-        print("paused stream sighnUp");
         serverSignUpSbub.pause();
       }
       setUserStatus();
@@ -73,8 +69,7 @@ class UserState extends ChangeNotifier {
   }
 
   void setUserStatus() {
-    userStatus =
-        (userFirbase ?? false) && (userSignUp ?? false);
+    userStatus = (userFirbase ?? false) && (userSignUp ?? false);
     notifyListeners();
   }
 
@@ -94,10 +89,10 @@ class UserState extends ChangeNotifier {
     return _user;
   }
 
-  void setData() async {
-    var user = await FirebaseAuth.instance.currentUser();
-    print("in the sec ${user.displayName}");
-  }
+  // void setData() async {
+  //   var user = await FirebaseAuth.instance.currentUser();
+
+  // }
 
   set siginInFirbase(bool value) {
     userFirbase = value;
@@ -112,8 +107,6 @@ class UserState extends ChangeNotifier {
     notifyListeners();
   }
 
-  
-
   void signOut() {
     bool value = false;
     AuthServies.signOut();
@@ -123,5 +116,29 @@ class UserState extends ChangeNotifier {
     userFirbase = value;
     userSignUp = null;
     notifyListeners();
+  }
+
+  Function siginInFirebase(String mode) {
+    return () async {
+      try {
+        if (mode == "google") {
+          if (await AuthServies().signinWithGoogle()) {
+            this.siginInFirbase = true;
+          }
+        } else {
+          print("$mode is not created yet");
+        }
+      } catch (e) {
+        print("Error from siginInFirebase $e");
+      }
+    };
+  }
+
+  @override
+  void dispose() {
+    firebaseSignUpSbub.cancel();
+    serverSignUpSbub.cancel();
+    register.dispose();
+    super.dispose();
   }
 }

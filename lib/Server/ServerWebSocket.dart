@@ -1,7 +1,8 @@
+import 'package:beru/Server/ServerApi.dart';
 import 'package:web_socket_channel/io.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
 
-const String url = "ws://192.168.43.220:80";
+String url =ServerApi.offlineOnline? "ws://${ServerApi.dns}":"wss://${ServerApi.dns}";
 const String categorySec = "catogoryTrue";
 const String sallesSec = "sallesTrue";
 WebSocketChannel serverSocket(String section) {
