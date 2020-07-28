@@ -3,7 +3,6 @@ import 'package:beru/Route/Route.dart';
 import 'package:beru/Theme/DefaultTheme.dart';
 import 'package:beru/UI/Home/BeruHome.dart';
 import 'package:beru/UI/InterNetConectivity/InitalCheck.dart';
-import 'package:beru/UI/Login/AddessAdding.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 

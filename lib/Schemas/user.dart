@@ -2,11 +2,9 @@ import 'package:beru/CustomFunctions/BeruString.dart';
 import 'package:beru/Schemas/address.dart';
 
 class User {
-  String _firstName;
+  String firstName;
 
-  String get firstName => _firstName;
-
-  set firstName(String firstName) => _firstName = firstName;
+ 
   String lastName;
   int phoneNumber;
   String email;
@@ -28,7 +26,7 @@ class User {
 
   User();
   User.fromMap(Map<String, dynamic> data) {
-    this._firstName = data['firstName'] ?? null;
+    this.firstName = data['firstName'] ?? null;
     this.lastName = data['lastName'] ?? null;
     this.phoneNumber = data['phoneNumber'] ?? null;
     this.sex = data['sex'] ?? null;
@@ -37,7 +35,7 @@ class User {
     this.email = data['email'] ?? null;
   }
   User.fromMapTest(Map<String, dynamic> data) {
-    this._firstName = data['firstName'] ?? null;
+    this.firstName = data['firstName'] ?? null;
     this.lastName = data['lastName'] ?? null;
     this.phoneNumber = data['phoneNumber'] ?? null;
     this.sex = data['sex'] ?? null;
@@ -48,7 +46,7 @@ class User {
 
   Map<String, dynamic> toMap() {
     return {
-      'firstName': this._firstName ?? null,
+      'firstName': this.firstName ?? null,
       'lastName': this.lastName ?? null,
       'phoneNumber': this.phoneNumber ?? null,
       'sex': this.sex ?? null,

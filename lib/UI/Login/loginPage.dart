@@ -1,4 +1,3 @@
-import 'package:beru/Auth/AuthServies.dart';
 import 'package:beru/BLOC/CustomProviders/userProvider.dart';
 import 'package:beru/Responsive/CustomRatio.dart';
 import 'package:flutter/material.dart';
