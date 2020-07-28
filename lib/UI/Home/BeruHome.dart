@@ -199,10 +199,10 @@ class ShowProductOnSalles extends StatelessWidget {
             ),
             ...showProucts(product, context),
             Padding(
-              padding: EdgeInsets.all(ResponsiveRatio.getHight(10, context)),
+              padding: EdgeInsets.all(ResponsiveRatio.getHight(5, context)),
               child: Container(
                 color: Color(0xffebebeb),
-                height: 2.0,
+                height:ResponsiveRatio.getHight(2, context),
               ),
             ),
             RaisedButton(
@@ -236,7 +236,7 @@ class ShowProductOnSalles extends StatelessWidget {
 List<Widget> showProucts(Product product, BuildContext context) {
   return [
     Container(
-      height: ResponsiveRatio.getHight(75, context),
+      height: ResponsiveRatio.getHight(60, context),
       decoration: BoxDecoration(
         color: Colors.white,
         image: DecorationImage(

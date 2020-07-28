@@ -81,7 +81,7 @@ class ProductSallesStream {
       }, onError: (error) {
         print("From lisenetr error $error");
       }, onDone: () {
-        print("canceled the Stream in Listern");
+        print("canceled the Stream in Listern product");
         webSocketControl();
       });
     } catch (e) {

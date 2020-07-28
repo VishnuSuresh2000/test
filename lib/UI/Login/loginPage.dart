@@ -38,7 +38,7 @@ class _BeruLoginState extends State<BeruLogin> {
                   text: 'Sign in with',
                   img: 'assets/images/socialMedia/google.png',
                   callBack: Provider.of<UserState>(context, listen: false)
-                      .siginInFirebase("google",context),
+                      .siginInFirebase("google", context),
                 ),
                 LoginButton(
                   text: 'Sign in with',
@@ -79,11 +79,14 @@ class LoginButton extends StatelessWidget {
       color: Colors.white,
       child: MaterialButton(
         minWidth: MediaQuery.of(context).size.width,
-        padding: EdgeInsets.fromLTRB(
-            ResponsiveRatio.getWigth(70.0, context),
-            ResponsiveRatio.getHight(15.0, context),
-            ResponsiveRatio.getWigth(70.0, context),
-            ResponsiveRatio.getHight(15.0, context)),
+        padding: EdgeInsets.symmetric(
+            vertical: ResponsiveRatio.getHight(12.0, context),
+            horizontal: ResponsiveRatio.getWigth(45.0, context)
+            // ResponsiveRatio.getWigth(70.0, context),/left
+            // ResponsiveRatio.getHight(15.0, context),/top
+            // ResponsiveRatio.getWigth(70.0, context),
+            // ResponsiveRatio.getHight(15.0, context)
+            ),
         onPressed: callBack,
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -93,7 +96,7 @@ class LoginButton extends StatelessWidget {
                 style: TextStyle(
                     color: Colors.black,
                     fontWeight: FontWeight.bold,
-                    fontSize: 20)),
+                    fontSize: 18)),
             Image(
               image: AssetImage(img),
               height: ResponsiveRatio.getHight(34.0, context),
