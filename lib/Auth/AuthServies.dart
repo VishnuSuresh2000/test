@@ -23,7 +23,7 @@ class AuthServies {
     }
   }
 
-  static signOut() {
-    FirebaseAuth.instance.signOut();
+  static Future signOut() {
+    return FirebaseAuth.instance.signOut();
   }
 }

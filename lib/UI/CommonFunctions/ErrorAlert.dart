@@ -8,10 +8,7 @@ void errorAlert(BuildContext context, String msg) {
       return AlertDialog(
         title: Text(
           "$msg",
-          style: TextStyle(
-            fontSize: 10,
-            color: Colors.red,
-          ),
+          style:Theme.of(context).textTheme.subtitle1,
         ),
         actions: [
           RaisedButton(

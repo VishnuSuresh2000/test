@@ -4,7 +4,7 @@ import 'package:beru/UI/InterNetConectivity/CheckConnectivity.dart';
 import 'package:beru/UI/Login/checkUserStatus.dart';
 import 'package:flutter/material.dart';
 
-class InitalNetWorkCheck extends StatelessWidget {
+class InitalCheck extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {

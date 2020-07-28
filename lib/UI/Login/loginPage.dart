@@ -39,7 +39,7 @@ class _BeruLoginState extends State<BeruLogin> {
                   text: 'Sign in with',
                   img: 'assets/images/socialMedia/google.png',
                   callBack: Provider.of<UserState>(context, listen: false)
-                      .siginInFirebase("google"),
+                      .siginInFirebase("google",context),
                 ),
                 LoginButton(
                   text: 'Sign in with',

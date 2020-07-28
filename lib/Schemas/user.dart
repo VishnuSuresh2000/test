@@ -2,7 +2,11 @@ import 'package:beru/CustomFunctions/BeruString.dart';
 import 'package:beru/Schemas/address.dart';
 
 class User {
-  String firstName;
+  String _firstName;
+
+  String get firstName => _firstName;
+
+  set firstName(String firstName) => _firstName = firstName;
   String lastName;
   int phoneNumber;
   String email;
@@ -24,7 +28,7 @@ class User {
 
   User();
   User.fromMap(Map<String, dynamic> data) {
-    this.firstName = data['firstName'] ?? null;
+    this._firstName = data['firstName'] ?? null;
     this.lastName = data['lastName'] ?? null;
     this.phoneNumber = data['phoneNumber'] ?? null;
     this.sex = data['sex'] ?? null;
@@ -33,7 +37,7 @@ class User {
     this.email = data['email'] ?? null;
   }
   User.fromMapTest(Map<String, dynamic> data) {
-    this.firstName = data['firstName'] ?? null;
+    this._firstName = data['firstName'] ?? null;
     this.lastName = data['lastName'] ?? null;
     this.phoneNumber = data['phoneNumber'] ?? null;
     this.sex = data['sex'] ?? null;
@@ -44,11 +48,21 @@ class User {
 
   Map<String, dynamic> toMap() {
     return {
-      'firstName': this.firstName ?? null,
+      'firstName': this._firstName ?? null,
       'lastName': this.lastName ?? null,
       'phoneNumber': this.phoneNumber ?? null,
       'sex': this.sex ?? null,
       'address': this.address == null ? null : this.address.toMap(),
+      'email': this.email ?? null
+    };
+  }
+
+  Map<String, dynamic> toMapForUserRegister() {
+    return {
+      'firstName': this.firstName ?? null,
+      'lastName': this.lastName ?? null,
+      'phoneNumber': this.phoneNumber ?? null,
+      'sex': this.sex ?? null,
       'email': this.email ?? null
     };
   }

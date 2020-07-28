@@ -5,50 +5,69 @@ import 'package:dio/dio.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 class BeruRegister {
-  final StreamController registerController = StreamController<bool>();
-
-  Timer timer;
+  StreamController<bool> registerController;
+  bool load = true;
   BeruRegister() {
-    registerController.onPause = () => timer.cancel();
-    registerController.onResume = timerSetUp;
-    registerController.onListen = timerSetUp;
+    registerController = StreamController<bool>(
+      onListen: setUp,
+      onResume: () {
+        load = true;
+        print("On Resume in Server Register");
+        continueCheck();
+      },
+      onPause: () {
+        load = false;
+        print("on pause in server Register");
+      },
+      // onCancel: () {
+      //   print("cancel Stream  in server Register");
+      // },
+    );
+
+    //   load = true;
+    //   continueCheck();
+    // };
   }
 
-  void timerSetUp() {
-    timer = Timer.periodic(Duration(seconds: 5), (timer) async {
-
-      try {
-        var user = await FirebaseAuth.instance.currentUser();
-        if (user != null) {
-          if (await ServerApi.serverCheckIfExist()) {
-    
-            registerController.sink.add(true);
-            timer.cancel();
-          }
-        } else if (user == null) {
-     
-          registerController.sink.add(false);
+  void setUp() async {
+    print("called Server check function setUp");
+    try {
+      var user = await FirebaseAuth.instance.currentUser();
+      if (user != null) {
+        if (await ServerApi.serverCheckIfExist()) {
+          registerController.sink.add(true);
+          load = false;
         }
-      } on SighUpNotComplete {
+      } else if (user == null) {
         registerController.sink.add(false);
-        timer.cancel();
-      } on DioError {
-        registerController.addError(BeruServerError());
-      } on TimeoutException {
-        registerController.addError(BeruServerError());
-      } catch (e) {
-        print(e);
-        registerController.addError(e);
       }
-    });
+    } on SighUpNotComplete {
+      registerController.sink.add(false);
+      load = false;
+    } on DioError {
+      registerController.addError(BeruServerError());
+      continueCheck();
+    } on TimeoutException {
+      registerController.addError(BeruServerError());
+      continueCheck();
+    } catch (e) {
+      print("Error from register Server $e");
+      continueCheck();
+      registerController.addError(e);
+    }
   }
 
   Stream<bool> get stream {
     return registerController.stream;
   }
 
+  void continueCheck() {
+    if (load) {
+      setUp();
+    }
+  }
+
   void dispose() {
-    timer.cancel();
     registerController.close();
   }
 }

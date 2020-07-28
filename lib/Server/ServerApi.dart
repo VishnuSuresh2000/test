@@ -56,7 +56,7 @@ class ServerApi {
       print(user.toMap());
       var head = "Bearer ${await tokenForServer()}";
       Response res = await _client.post('/customer/create',
-          data: jsonEncode(user.toMap()),
+          data: jsonEncode(user.toMapForUserRegister()),
           options: Options(headers: {"authorization": head}));
       return res.data['data'];
     } on NoUserException catch (e) {
