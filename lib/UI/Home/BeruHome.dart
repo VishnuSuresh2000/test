@@ -242,7 +242,8 @@ List<Widget> showProucts(Product product, BuildContext context) {
         image: DecorationImage(
           image: product.hasImg
               ? NetworkImage(
-                  "${ServerApi.url}/product/getImage/${product.name}")
+                  "${ServerApi.url}/product/getImage/${product.name}",
+                  )
               : AssetImage('assets/images/NoImg.png'),
         ),
       ),

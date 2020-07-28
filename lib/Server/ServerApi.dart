@@ -10,7 +10,7 @@ import 'package:dio/dio.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 class ServerApi {
-  static bool offlineOnline = true;
+  static bool offlineOnline = false;
   static String dns =
       offlineOnline ? "192.168.43.220:80" : "beru-server.herokuapp.com";
   static String url = offlineOnline ? "http://$dns" : "https://$dns";
