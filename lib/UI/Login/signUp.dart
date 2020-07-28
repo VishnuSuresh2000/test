@@ -1,6 +1,7 @@
 import 'dart:ui';
 import 'package:beru/BLOC/CustomProviders/userProvider.dart';
 import 'package:beru/Responsive/CustomRatio.dart';
+import 'package:beru/UI/CommonFunctions/BeruFormButton.dart';
 import 'package:beru/UI/CommonFunctions/ErrorAlert.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -139,14 +140,9 @@ class _BeruSignUpState extends State<BeruSignUp> {
                         decoration:
                             textFormFieldDecoration(hintText: "Phone Number")),
                     spaceingWidget(),
-                    Material(
-                      elevation: 5.0,
-                      borderRadius: BorderRadius.circular(30.0),
-                      color: Colors.green[500],
-                      child: MaterialButton(
-                        minWidth: MediaQuery.of(context).size.width,
-                        padding: EdgeInsets.fromLTRB(20.0, 15.0, 20.0, 15.0),
-                        onPressed: () {
+                    beruFormButton(
+                        context: context,
+                        callBack: () {
                           if (_userState.user.sex == null) {
                             errorAlert(context, "Please Select Gender");
                           } else if (_userState.user.sex != null) {
@@ -156,13 +152,7 @@ class _BeruSignUpState extends State<BeruSignUp> {
                             }
                           }
                         },
-                        child: Text("SAVE & CONTINUE",
-                            textAlign: TextAlign.center,
-                            style: style.copyWith(
-                                color: Colors.white,
-                                fontWeight: FontWeight.bold)),
-                      ),
-                    )
+                        content: "SAVE & CONTINUE")
                   ],
                 ),
               ),
@@ -172,6 +162,8 @@ class _BeruSignUpState extends State<BeruSignUp> {
       ),
     );
   }
+
+  
 
   AspectRatio spaceingWidget() => AspectRatio(aspectRatio: 11);
 

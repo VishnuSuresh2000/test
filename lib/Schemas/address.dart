@@ -7,6 +7,8 @@ class Address {
   int pinCode;
   int alternateNumber;
 
+  Address();
+
   Address.fromMap(Map<String, dynamic> data) {
     this.houseName = data['houseName'];
     this.locality = data['locality'];
@@ -18,13 +20,13 @@ class Address {
   }
   Map<String, dynamic> toMap() {
     return {
-      'houseName':this.houseName,
-      'locality':this.locality,
-      'pinCode':this.pinCode,
-      'city':this.city,
-      'district':this.district,
-      'state':this.state,
-      'alternateNumber':this.alternateNumber,
+      'houseName': this.houseName,
+      'locality': this.locality,
+      'pinCode': this.pinCode,
+      'city': this.city,
+      'district': this.district,
+      'state': this.state,
+      'alternateNumber': this.alternateNumber,
     };
   }
 }

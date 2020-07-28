@@ -3,9 +3,11 @@ import 'dart:async';
 import 'package:beru/Auth/AuthServies.dart';
 import 'package:beru/BLOC/CustomeStream/StreamToCheckRegister.dart';
 import 'package:beru/CustomException/BeruException.dart';
+import 'package:beru/Schemas/address.dart';
 import 'package:beru/Schemas/user.dart';
 import 'package:beru/Server/ServerApi.dart';
 import 'package:beru/UI/CommonFunctions/BeruAlertWithCallBack.dart';
+import 'package:beru/UI/CommonFunctions/ErrorAlert.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
@@ -19,10 +21,11 @@ class UserState extends ChangeNotifier {
   bool userSignUp;
   bool userStatus; //true siginin, false sigin out
   bool serverError = false;
+  bool hasAddress;
   Exception error;
 
   UserState() : super() {
-    // autoUserStatusCheck();
+    autoUserStatusCheck();
   }
 
   void autoUserStatusCheck() {
@@ -71,6 +74,9 @@ class UserState extends ChangeNotifier {
       if (!event) {
         print("No user registerd Stream From ServerSignUp");
         setTempData();
+      }
+      if (event) {
+        checkHasAddress();
       }
       if (!serverSignUpSbub.isPaused) {
         serverSignUpSbub.pause();
@@ -145,6 +151,7 @@ class UserState extends ChangeNotifier {
       serverSignUpSbub.pause();
     }
     userSignUp = value;
+    this.hasAddress = false;
     setUserStatus();
     notifyListeners();
   }
@@ -156,6 +163,7 @@ class UserState extends ChangeNotifier {
       userStatus = false;
       userFirbase = false;
       userSignUp = null;
+      this.hasAddress = null;
       if (!serverSignUpSbub.isPaused) {
         serverSignUpSbub.pause();
       }
@@ -165,7 +173,6 @@ class UserState extends ChangeNotifier {
       // }
       notifyListeners();
     });
-
   }
 
   Function siginInFirebase(String mode, BuildContext context) {
@@ -202,7 +209,10 @@ class UserState extends ChangeNotifier {
             this.siginUpServer = true;
             Navigator.of(context).pop();
           });
-    } catch (e) {}
+    } catch (e) {
+      print("Error from siginInFirebase $e");
+      errorAlert(context, e.toString());
+    }
   }
 
   @override
@@ -211,5 +221,35 @@ class UserState extends ChangeNotifier {
     serverSignUpSbub.cancel();
     register.dispose();
     super.dispose();
+  }
+
+  void checkHasAddress() async {
+    try {
+      print("called the function CheckHass address");
+      this.hasAddress = await ServerApi.serverCheckhasAddress();
+      notifyListeners();
+    } catch (e) {
+      print("Error from Check has address $e");
+      checkHasAddress();
+    }
+  }
+
+  void addAddressToUser(Address address, BuildContext context) async {
+    try {
+      print("called the function add address");
+      var res = await ServerApi.addAddress(address);
+      alertWithCallBack(
+          context: context,
+          content: res.toString(),
+          callBackName: "Continue",
+          cakllback: () {
+            this.hasAddress = true;
+            notifyListeners();
+            Navigator.of(context).pop();
+          });
+    } catch (e) {
+      print("Error from siginInFirebase $e");
+      errorAlert(context, e.toString());
+    }
   }
 }

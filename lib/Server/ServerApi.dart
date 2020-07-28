@@ -4,16 +4,18 @@ import 'package:beru/CustomException/BeruException.dart';
 import 'package:beru/DataStructures/BeruServerError.dart';
 import 'package:beru/Schemas/BeruCategory.dart';
 import 'package:beru/Schemas/Product.dart';
+import 'package:beru/Schemas/address.dart';
 import 'package:beru/Schemas/user.dart';
 import 'package:dio/dio.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 class ServerApi {
-  static bool offlineOnline=true;
-  static String dns = offlineOnline ? "192.168.43.220:80" : "beru-server.herokuapp.com";
-  static String url=offlineOnline?"http://$dns":"https://$dns";
+  static bool offlineOnline = true;
+  static String dns =
+      offlineOnline ? "192.168.43.220:80" : "beru-server.herokuapp.com";
+  static String url = offlineOnline ? "http://$dns" : "https://$dns";
   static BaseOptions _options = BaseOptions(
-    baseUrl:url,
+    baseUrl: url,
     connectTimeout: 3000,
   );
   static Dio _client = Dio(_options);
@@ -27,7 +29,6 @@ class ServerApi {
       throw NoUserException();
     }
   }
-
 
   static Future<bool> serverCheckIfExist() async {
     try {
@@ -103,6 +104,41 @@ class ServerApi {
       } else {
         throw BeruUnKnownError(error: e.response.data['data'].toString());
       }
+    } on TimeoutException {
+      throw BeruServerError();
+    } catch (e) {
+      print(e);
+      throw e;
+    }
+  }
+
+  static Future<bool> serverCheckhasAddress() async {
+    try {
+      Response res = await _client.get('/customer/hasAddress',
+          options: Options(
+              headers: {"authorization": "Bearer ${await tokenForServer()}"}));
+      return res.data['data'];
+    } on DioError catch (e) {
+      print(e.response.data['data'].toString() + "dio error");
+      throw BeruUnKnownError(error: e.response.data['data'].toString());
+    } on TimeoutException {
+      throw BeruServerError();
+    } catch (e) {
+      print(e);
+      throw e;
+    }
+  }
+
+  static Future<String> addAddress(Address data) async {
+    try {
+      Response res = await _client.put('/customer/addAddress',
+          options: Options(
+              headers: {"authorization": "Bearer ${await tokenForServer()}"}),
+          data: json.encode(data.toMap()));
+      return res.data['data'];
+    } on DioError catch (e) {
+      print(e.response.data['data'].toString() + "dio error");
+      throw BeruUnKnownError(error: e.response.data['data'].toString());
     } on TimeoutException {
       throw BeruServerError();
     } catch (e) {
