@@ -3,6 +3,7 @@ import 'package:beru/Route/Route.dart';
 import 'package:beru/Theme/DefaultTheme.dart';
 import 'package:beru/UI/Home/BeruHome.dart';
 import 'package:beru/UI/InterNetConectivity/InitalCheck.dart';
+import 'package:beru/UI/Profile/BeruProfileView.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -19,7 +20,7 @@ class MyApp extends StatelessWidget {
         theme: defaultTheme,
         onGenerateRoute: (settings) => transitionOnRoute(settings),
         debugShowCheckedModeBanner: false,
-        home: InitalCheck(),
+        home: BeruProfile(),
       ),
     );
   }

@@ -9,6 +9,7 @@ import 'package:beru/Schemas/Salles.dart';
 import 'package:beru/Server/ServerApi.dart';
 import 'package:beru/UI/CommonFunctions/BeruErrorPage.dart';
 import 'package:beru/UI/CommonFunctions/BeruLodingBar.dart';
+import 'package:beru/UI/Home/BeruBottomNavigator.dart';
 import 'package:beru/UI/Home/ProductShowAlert.dart';
 import 'package:beru/UI/InterNetConectivity/CheckConnectivity.dart';
 import 'package:flutter/material.dart';
@@ -59,9 +60,14 @@ class _BeruHomeState extends State<BeruHome> with TickerProviderStateMixin {
     });
 
     return Scaffold(
-        floatingActionButton: FloatingActionButton(
-          onPressed: () =>Provider.of<UserState>(context,listen: false).signOut(),
-          child: Text("Out"),
+        bottomNavigationBar: BeruBottomNavigator(),
+        floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
+        floatingActionButton: FloatingActionButton.extended(
+          onPressed: () =>
+              Provider.of<UserState>(context, listen: false).signOut(),
+          label: Text(
+            "Sign Out",
+          ),
         ),
         body: NestedScrollView(
           headerSliverBuilder: (context, innerBoxIsScrolled) {
@@ -202,7 +208,7 @@ class ShowProductOnSalles extends StatelessWidget {
               padding: EdgeInsets.all(ResponsiveRatio.getHight(5, context)),
               child: Container(
                 color: Color(0xffebebeb),
-                height:ResponsiveRatio.getHight(2, context),
+                height: ResponsiveRatio.getHight(2, context),
               ),
             ),
             RaisedButton(
@@ -243,7 +249,7 @@ List<Widget> showProucts(Product product, BuildContext context) {
           image: product.hasImg
               ? NetworkImage(
                   "${ServerApi.url}/product/getImage/${product.name}",
-                  )
+                )
               : AssetImage('assets/images/NoImg.png'),
         ),
       ),
