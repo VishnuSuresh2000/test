@@ -1,9 +1,10 @@
 import 'package:beru/Responsive/CustomRatio.dart';
 import 'package:beru/Schemas/Product.dart';
 import 'package:beru/Schemas/Salles.dart';
+import 'package:beru/Server/ServerApi.dart';
 import 'package:beru/UI/CommonFunctions/ErrorAlert.dart';
 import 'package:flutter/material.dart';
-import 'BeruHome.dart';
+import 'package:velocity_x/velocity_x.dart';
 
 class ProductShowAlert extends StatefulWidget {
   final Salles sallesProduct;
@@ -197,5 +198,31 @@ class _ProductShowAlertState extends State<ProductShowAlert> {
         ),
       ),
     );
+  }
+
+  List<Widget> showProucts(Product product, BuildContext context) {
+    return [
+      Container(
+        height: context.isMobile ? 70 : context.percentHeight * 0.2,
+        decoration: BoxDecoration(
+          color: Colors.white,
+          image: DecorationImage(
+            image: product.hasImg
+                ? NetworkImage(
+                    "${ServerApi.url}/product/getImage/${product.id}",
+                  )
+                : AssetImage('assets/images/NoImg.png'),
+          ),
+        ),
+      ),
+      Text(
+        "\₹ ${product.amount}",
+        style: Theme.of(context).textTheme.caption,
+      ),
+      Text(
+        "${product.name.firstLetterUpperCase()}",
+        style: Theme.of(context).textTheme.subtitle2,
+      )
+    ];
   }
 }

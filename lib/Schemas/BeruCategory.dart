@@ -1,6 +1,7 @@
 class BeruCategory {
   String _id;
   String name;
+  bool hasImg;
 
   String get id {
     return _id;
@@ -14,6 +15,7 @@ class BeruCategory {
   BeruCategory.fromMap(Map<String, dynamic> data) {
     this._id = data['_id'] ?? null;
     this.name = data['name'] ?? null;
+    this.hasImg = data['hasImg'] ?? false;
   }
 
   Map<String, dynamic> toMap() {

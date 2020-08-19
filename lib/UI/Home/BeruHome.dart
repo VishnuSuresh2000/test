@@ -1,19 +1,20 @@
 import 'package:beru/BLOC/CustomProviders/BLOCForCategory.dart';
-import 'package:beru/BLOC/CustomProviders/userProvider.dart';
+import 'package:beru/BLOC/CustomProviders/BLOCForHome.dart';
 import 'package:beru/BLOC/CustomeStream/ProductStream.dart';
 import 'package:beru/CustomFunctions/BeruString.dart';
 import 'package:beru/Responsive/CustomRatio.dart';
 import 'package:beru/Schemas/BeruCategory.dart';
 import 'package:beru/Schemas/Product.dart';
-import 'package:beru/Schemas/Salles.dart';
 import 'package:beru/Server/ServerApi.dart';
 import 'package:beru/UI/CommonFunctions/BeruErrorPage.dart';
 import 'package:beru/UI/CommonFunctions/BeruLodingBar.dart';
 import 'package:beru/UI/Home/BeruBottomNavigator.dart';
-import 'package:beru/UI/Home/ProductShowAlert.dart';
 import 'package:beru/UI/InterNetConectivity/CheckConnectivity.dart';
+import 'package:beru/UI/Product/ShowProduct.dart';
+import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:velocity_x/velocity_x.dart';
 
 class BeruHome extends StatefulWidget {
   static const String route = '/BeruHome';
@@ -26,107 +27,164 @@ class _BeruHomeState extends State<BeruHome> with TickerProviderStateMixin {
   List<ProductSallesStream> streams = [];
   @override
   Widget build(BuildContext context) {
-    return checkInterNet(getCategory(context));
+    return checkInterNet(body(context));
   }
 
   Consumer getCategory(BuildContext context) {
     return Consumer<BlocForCategory>(
       builder: (context, value, child) {
         if (value == null || value.data.loading) {
-          return BeruLoadingBar();
+          return beruLoadingBar();
         } else if (value.data.isError) {
           return BeruErrorPage(
             errMsg: value.data.error.toString(),
           );
         } else {
-          return body(context, value.data.list);
+          return GridView.builder(
+            padding: EdgeInsets.symmetric(horizontal: 20, vertical: 15),
+            itemCount: value.data.list.length,
+            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: context.isMobile ? 2 : 6,
+                crossAxisSpacing: 20,
+                childAspectRatio: 1.2,
+                mainAxisSpacing: 20),
+            itemBuilder: (context, index) =>
+                showCategory(value.data.list[index], context),
+          );
         }
       },
     );
   }
 
-  Scaffold body(BuildContext context, List<BeruCategory> items) {
-    TabController tabController;
-    try {
-      tabController =
-          TabController(length: items.length, vsync: this, initialIndex: index);
-    } catch (e) {
-      print("Error from tab controller init $e");
-      tabController =
-          TabController(length: items.length, vsync: this, initialIndex: 0);
-    }
-    tabController.addListener(() {
-      index = tabController.index;
-    });
-
-    return Scaffold(
-        bottomNavigationBar: BeruBottomNavigator(),
-        floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
-        floatingActionButton: FloatingActionButton.extended(
-          onPressed: () =>
-              Provider.of<UserState>(context, listen: false).signOut(),
-          label: Text(
-            "Sign Out",
-          ),
-        ),
-        body: NestedScrollView(
-          headerSliverBuilder: (context, innerBoxIsScrolled) {
-            return <Widget>[
-              SliverAppBar(
-                leading: Icon(
-                  Icons.menu,
-                ),
-                actions: <Widget>[
-                  Padding(
-                    padding: EdgeInsets.only(
-                        right: ResponsiveRatio.getWigth(10, context)),
-                    child: Icon(
-                      Icons.notifications,
-                    ),
-                  ),
-                ],
-                centerTitle: true,
-                pinned: true,
-                expandedHeight: ResponsiveRatio.getHight(180, context),
-                flexibleSpace: FlexibleSpaceBar(
-                  collapseMode: CollapseMode.none,
-                  titlePadding: EdgeInsets.only(
-                      top: ResponsiveRatio.getHight(100, context),
-                      bottom: ResponsiveRatio.getHight(60, context),
-                      left: ResponsiveRatio.getWigth(20, context)),
-                  title: Text(
-                    "Categories",
-                    style: Theme.of(context).textTheme.headline2,
-                  ),
-                ),
-                title: Text("Beru"),
-                bottom: TabBar(
-                    indicatorColor: Colors.transparent,
-                    controller: tabController,
-                    tabs: items
-                        .map((e) => Tab(
-                              text: "${e.name.toString().toUpperCase()}",
-                            ))
-                        .toList()),
-              )
-            ];
+  showCategory(BeruCategory e, BuildContext context) {
+    return Selector<BloCForHome, Function>(
+      shouldRebuild: (previous, next) => false,
+      selector: (_, handler) => handler.setCategory,
+      builder: (context, value, child) {
+        return InkWell(
+          onTap: () {
+            value(e);
+            context.nav.pushNamed(ShowProducts.route);
           },
-          body: tabBarViewHome(items, tabController),
-        ));
+          child: Card(
+            elevation: 5,
+            shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.all(Radius.circular(20))),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: [
+                Flexible(
+                    flex: 2,
+                    child: e.hasImg
+                        ? Image.network(
+                            "${ServerApi.url}/category/getImage/${e.id}",
+                            fit: BoxFit.contain,
+                            errorBuilder: (context, error, stackTrace) =>
+                                "$error".text.bold.make().centered(),
+                          )
+                        : Image.asset(
+                            "assets/images/NoImg.png",
+                            fit: BoxFit.contain,
+                          )),
+                Flexible(
+                    flex: 1,
+                    child: Text(
+                      "${firstToUpperCaseString(e.name)}",
+                      style: Theme.of(context).textTheme.subtitle1,
+                    ))
+              ],
+            ),
+          ),
+        );
+      },
+    );
   }
 
-  TabBarView tabBarViewHome(
-      List<BeruCategory> items, TabController tabController) {
-    return TabBarView(
-      children: items.map((e) {
-        var stream = ProductSallesStream(category: e);
-        streams.add(stream);
-        return ShowProductOnSalles(
-          stream: stream.stream,
-        );
-      }).toList(),
-      controller: tabController,
-    );
+  body(BuildContext context) {
+    return Scaffold(
+        bottomNavigationBar: BeruBottomNavigator(), body: nestedScrollView());
+  }
+
+  NestedScrollView nestedScrollView() {
+    return NestedScrollView(
+        headerSliverBuilder: (context, innerBoxIsScrolled) {
+          return [
+            SliverAppBar(
+              leading: Icon(
+                Icons.menu,
+              ),
+              centerTitle: true,
+              pinned: true,
+              title: Text("Beru"),
+            ),
+            SliverToBoxAdapter(
+              child: SizedBox.fromSize(
+                size: Size.fromHeight(ResponsiveRatio.getHight(10, context)),
+              ),
+            ),
+            SliverToBoxAdapter(
+              child: Padding(
+                padding:
+                    EdgeInsets.symmetric(horizontal: context.isMobile ? 0 : 20),
+                child: Container(
+                  decoration: BoxDecoration(
+                      shape: BoxShape.rectangle,
+                      borderRadius: BorderRadius.all(Radius.circular(20))),
+                  child: CarouselSlider(
+                    options: CarouselOptions(
+                      aspectRatio: context.isMobile ? 2.8 : 9,
+                      viewportFraction: context.isMobile ? 0.85 : 0.35,
+                      enableInfiniteScroll: true,
+                      reverse: false,
+                      autoPlay: true,
+                      autoPlayInterval: Duration(seconds: 3),
+                      autoPlayAnimationDuration: Duration(milliseconds: 800),
+                      autoPlayCurve: Curves.fastOutSlowIn,
+                      enlargeCenterPage: context.isMobile ? true : false,
+                      scrollDirection: Axis.horizontal,
+                    ),
+                    items: [1, 2, 3, 4, 5].map(
+                      (i) {
+                        return Card(
+                            margin: EdgeInsets.symmetric(
+                                horizontal: context.isMobile ? 0 : 20),
+                            elevation: 5,
+                            color: Colors.blueAccent,
+                            child: Container(
+                              width: MediaQuery.of(context).size.width,
+                              child: Center(
+                                child: Text(
+                                  'text $i',
+                                  style: TextStyle(fontSize: 16.0),
+                                ),
+                              ),
+                            ));
+                      },
+                    ).toList(),
+                  ),
+                ),
+              ),
+            ),
+            SliverToBoxAdapter(
+              child: SizedBox.fromSize(
+                size: Size.fromHeight(ResponsiveRatio.getHight(20, context)),
+              ),
+            ),
+            SliverToBoxAdapter(
+              child: Padding(
+                padding: EdgeInsets.symmetric(horizontal: 20),
+                child: Text(
+                  "Shop by Catagory",
+                  style: Theme.of(context)
+                      .textTheme
+                      .subtitle2
+                      .copyWith(fontWeight: FontWeight.bold),
+                ),
+              ),
+            )
+          ];
+        },
+        body: getCategory(context));
   }
 
   @override
@@ -138,129 +196,4 @@ class _BeruHomeState extends State<BeruHome> with TickerProviderStateMixin {
   }
 }
 
-class ShowProductOnSalles extends StatelessWidget {
-  final Stream<List<Product>> stream;
 
-  const ShowProductOnSalles({Key key, this.stream}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return buildStreamBuilder();
-  }
-
-  StreamBuilder<List<Product>> buildStreamBuilder() {
-    return StreamBuilder(
-      stream: stream,
-      builder: (context, snapshot) {
-        if (snapshot.hasError) {
-          return Center(
-            child: Text(
-              snapshot.error.toString(),
-              style: TextStyle(
-                color: Colors.red,
-                fontSize: 15,
-              ),
-            ),
-          );
-        } else if (snapshot.hasData) {
-          return GridView.count(
-            crossAxisCount: 2,
-            primary: false,
-            crossAxisSpacing: ResponsiveRatio.getWigth(15, context),
-            mainAxisSpacing: ResponsiveRatio.getHight(15, context),
-            childAspectRatio: .9,
-            scrollDirection: Axis.vertical,
-            padding: EdgeInsets.only(
-                left: ResponsiveRatio.getWigth(15, context),
-                right: ResponsiveRatio.getWigth(15, context),
-                top: ResponsiveRatio.getHight(10, context)),
-            children:
-                snapshot.data.map((e) => productView(e, context)).toList(),
-          );
-        } else {
-          return Container();
-        }
-      },
-    );
-  }
-
-  Widget productView(Product product, BuildContext context) {
-    int select = 0;
-    return Container(
-      decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(15.0),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.grey.withOpacity(0.2),
-              spreadRadius: 3.0,
-              blurRadius: 5.0,
-            ),
-          ],
-          color: Colors.white),
-      child: Center(
-        child: Column(
-          children: [
-            SizedBox.fromSize(
-              size: Size.fromHeight(ResponsiveRatio.getHight(10, context)),
-            ),
-            ...showProucts(product, context),
-            Padding(
-              padding: EdgeInsets.all(ResponsiveRatio.getHight(5, context)),
-              child: Container(
-                color: Color(0xffebebeb),
-                height: ResponsiveRatio.getHight(2, context),
-              ),
-            ),
-            RaisedButton(
-              onPressed: () {
-                showDialog(
-                  context: context,
-                  builder: (context) {
-                    Salles sallesProduct = product.salles[select];
-                    return ProductShowAlert(
-                      sallesProduct: sallesProduct,
-                      product: product,
-                    );
-                  },
-                );
-              },
-              elevation: 0,
-              child:
-                  Text("Buy Now", style: Theme.of(context).textTheme.subtitle1),
-            ),
-            SizedBox.fromSize(
-              size: Size.fromHeight(ResponsiveRatio.getHight(5, context)),
-            )
-          ],
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
-        ),
-      ),
-    );
-  }
-}
-
-List<Widget> showProucts(Product product, BuildContext context) {
-  return [
-    Container(
-      height: ResponsiveRatio.getHight(60, context),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        image: DecorationImage(
-          image: product.hasImg
-              ? NetworkImage(
-                  "${ServerApi.url}/product/getImage/${product.name}",
-                )
-              : AssetImage('assets/images/NoImg.png'),
-        ),
-      ),
-    ),
-    Text(
-      "\₹ ${product.amount}",
-      style: Theme.of(context).textTheme.caption,
-    ),
-    Text(
-      "${firstToUpperCaseString(product.name)}",
-      style: Theme.of(context).textTheme.subtitle2,
-    )
-  ];
-}

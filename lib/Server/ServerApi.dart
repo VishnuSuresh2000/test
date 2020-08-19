@@ -8,11 +8,13 @@ import 'package:beru/Schemas/address.dart';
 import 'package:beru/Schemas/user.dart';
 import 'package:dio/dio.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/foundation.dart';
 
 class ServerApi {
   static bool offlineOnline = false;
+  static String _dnsOnWebDev = kIsWeb ? "localhost:80" : "192.168.43.220:80";
   static String dns =
-      offlineOnline ? "192.168.43.220:80" : "beru-server.herokuapp.com";
+      offlineOnline ? _dnsOnWebDev : "beru-server.herokuapp.com";
   static String url = offlineOnline ? "http://$dns" : "https://$dns";
   static BaseOptions _options = BaseOptions(
     baseUrl: url,
@@ -76,7 +78,7 @@ class ServerApi {
 
   static Future<List<BeruCategory>> serverGetCategory() async {
     try {
-      Response res = await _client.get('/category/');
+      Response res = await _client.get('/category/data');
       List temp = res.data['data'];
       return temp.map((e) => BeruCategory.fromMap(e)).toList();
     } on DioError catch (e) {
@@ -93,8 +95,10 @@ class ServerApi {
   static Future<List<Product>> serverGetSallesProductByCategory(
       String category) async {
     try {
-      Response res =
-          await _client.get('/salles/getProductByCategory/$category');
+      Response res = await _client.get(
+          '/customer/salles/dataByCategory/$category',
+          options: Options(
+              headers: {"authorization": "Bearer ${await tokenForServer()}"}));
       List data = res.data['data'];
       return data.map((e) => Product.fromMap(e)).toList();
     } on DioError catch (e) {

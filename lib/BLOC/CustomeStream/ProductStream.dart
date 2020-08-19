@@ -8,54 +8,35 @@ import 'package:beru/Server/ServerWebSocket.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
 
 class ProductSallesStream {
-  bool dataOrError;
-  List<Product> data;
-  Exception error;
-
-  StreamController<List<Product>> _controller =
-      StreamController<List<Product>>.broadcast(
-    sync: true,
+  StreamController<List<Product>> _controller = StreamController<List<Product>>(
+    onCancel: () {},
   );
-  BeruCategory category = BeruCategory();
+  BeruCategory category;
   WebSocketChannel channel;
 
-  ProductSallesStream({BeruCategory category}) {
-    this.category = category;
-    getDataFromServer();
-    _controller.onListen = () {
-      if (dataOrError != null) {
-        dataOrError
-            ? _controller.sink.add(data)
-            : _controller.sink.addError(error);
-      }
-    };
+  ProductSallesStream() {
     webSocketControl();
   }
 
+  void init({BeruCategory category}) {
+    this.category = category;
+    getDataFromServer();
+   
+  }
+
   void getDataFromServer() async {
+    print("called get Data from server");
     try {
       var dataRes =
           await ServerApi.serverGetSallesProductByCategory(category.id);
-      dataOrError = true;
-      data = dataRes;
-      _controller.sink.add(data);
+      _controller.sink.add(dataRes);
     } on BeruNoProductForSalles catch (e) {
-      dataOrError = false;
-      error = e;
+      print("Error from Product stream ${e.toString()}");
       _controller.sink.addError(e);
     } catch (e) {
-      // if (dataOrError == null) {
-      //   dataOrError = true;
-      //   error = BeruNoProductForSalles();
-      //   _controller.sink.addError(error);
-      // }
-      dataOrError = false;
-      error = e;
+      _controller.sink.addError(e);
       print("Error from Product stream ${e.toString()}");
-    } finally {
-      if (!dataOrError && !(error is BeruNoProductForSalles)) {
-        getDataFromServer();
-      }
+      getDataFromServer();
     }
   }
 
@@ -63,8 +44,8 @@ class ProductSallesStream {
     return _controller.stream;
   }
 
-  void dispose() {
-    _controller.close();
+  void dispose() async {
+    await _controller.close();
     if (channel != null) {
       channel.sink.close();
     }
@@ -80,12 +61,14 @@ class ProductSallesStream {
         }
       }, onError: (error) {
         print("From lisenetr error $error");
+        // _controller.sink.addError(Exception("Error from websocket $error"));
       }, onDone: () {
         print("canceled the Stream in Listern product");
         webSocketControl();
       });
     } catch (e) {
       print("From Stream outside error $e");
+      // _controller.sink.addError(Exception("Error from websocket outside $e"));
       webSocketControl();
     }
   }

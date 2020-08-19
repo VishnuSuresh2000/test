@@ -1,46 +1,27 @@
 import 'package:beru/BLOC/BlocList.dart';
 import 'package:beru/Route/Route.dart';
+import 'package:beru/Server/ServerApi.dart';
 import 'package:beru/Theme/DefaultTheme.dart';
-import 'package:beru/UI/Home/BeruHome.dart';
 import 'package:beru/UI/InterNetConectivity/InitalCheck.dart';
-import 'package:beru/UI/Profile/BeruProfileView.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 void main() {
+  ServerApi.offlineOnline = false;
   runApp(MyApp());
 }
 
 class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    print("Server Url ${ServerApi.url}");
     return MultiProvider(
       providers: bloc,
       child: MaterialApp(
         theme: defaultTheme,
         onGenerateRoute: (settings) => transitionOnRoute(settings),
         debugShowCheckedModeBanner: false,
-        home: BeruProfile(),
-      ),
-    );
-  }
-}
-
-class TestNavigation extends StatelessWidget {
-  const TestNavigation({
-    Key key,
-  }) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      body: Container(
-        child: Center(
-          child: RaisedButton(
-            onPressed: () => Navigator.of(context).pushNamed(BeruHome.route),
-            child: Text("test Route"),
-          ),
-        ),
+        home: InitalCheck(),
       ),
     );
   }

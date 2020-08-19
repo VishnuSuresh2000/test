@@ -25,15 +25,15 @@ class CheckUserStatus extends StatelessWidget {
         print(
             "User Status firebase ${value.userFirbase} server ${value.userSignUp} address ${value.hasAddress}");
         if (value == null || value.userFirbase == null) {
-          return BeruLoadingBar();
+          return beruLoadingBar();
         } else if (!value.userFirbase) {
           return BeruLogin();
         } else if (value.userSignUp == null) {
-          return BeruLoadingBar();
+          return beruLoadingBar();
         } else if (value.userFirbase && !value.userSignUp) {
           return BeruSignUp();
         } else if (value.hasAddress == null) {
-          return BeruLoadingBar();
+          return beruLoadingBar();
         } else if (value.userFirbase && value.userSignUp && !value.hasAddress) {
           return BeruAdddressAdding();
         } else if (value.userFirbase && value.userSignUp) {
@@ -43,7 +43,7 @@ class CheckUserStatus extends StatelessWidget {
             errMsg: value.error.toString(),
           );
         } else {
-          return BeruLoadingBar();
+          return beruLoadingBar();
         }
       },
     );

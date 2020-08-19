@@ -44,13 +44,10 @@ class BlocForCategory extends ChangeNotifier {
   }
 
   void webSocketControl() {
-    
     try {
       channel = serverSocket('sync');
       channel.stream.listen((event) {
-    
         if (event == categorySec) {
- 
           setData();
         }
       }, onError: (error) {
@@ -60,7 +57,7 @@ class BlocForCategory extends ChangeNotifier {
         webSocketControl();
       });
     } catch (e) {
-      print("From Stream outside error $e");
+      print("From Stream Category outside error $e");
       webSocketControl();
     }
   }
