@@ -12,9 +12,9 @@ import 'package:flutter/foundation.dart';
 
 class ServerApi {
   static bool offlineOnline = false;
-  static String _dnsOnWebDev = kIsWeb ? "localhost:80" : "192.168.43.220:80";
+  static String switchWeb = kIsWeb ? "localhost:80" : "192.168.43.220:80";
   static String dns =
-      offlineOnline ? _dnsOnWebDev : "beru-server.herokuapp.com";
+      offlineOnline ? "$switchWeb" : "beru-server.herokuapp.com";
   static String url = offlineOnline ? "http://$dns" : "https://$dns";
   static BaseOptions _options = BaseOptions(
     baseUrl: url,
