@@ -14,7 +14,7 @@ void main() {
 class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    print("Server Url ${ServerApi.url}");
+    print("Server Url ${ServerApi.offlineOnline} ${ServerApi.url}");
     return MultiProvider(
       providers: bloc,
       child: MaterialApp(
