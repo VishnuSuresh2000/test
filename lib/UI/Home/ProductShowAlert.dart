@@ -203,7 +203,7 @@ class _ProductShowAlertState extends State<ProductShowAlert> {
   List<Widget> showProucts(Product product, BuildContext context) {
     return [
       Container(
-        height: context.isMobile ? 70 : context.percentHeight * 0.2,
+        height: context.isMobile ? 70 : 80,
         decoration: BoxDecoration(
           color: Colors.white,
           image: DecorationImage(
