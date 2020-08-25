@@ -51,7 +51,7 @@ class BeruRegister {
       registerController.addError(BeruServerError());
       continueCheck();
     } catch (e) {
-      print("Error from register Server $e");
+      print("Error from register Server $e ");
       continueCheck();
       registerController.addError(e);
     }

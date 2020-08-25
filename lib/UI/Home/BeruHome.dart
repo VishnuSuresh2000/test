@@ -1,10 +1,8 @@
 import 'package:beru/BLOC/CustomProviders/BLOCForCategory.dart';
 import 'package:beru/BLOC/CustomProviders/BLOCForHome.dart';
-import 'package:beru/BLOC/CustomeStream/ProductStream.dart';
+import 'package:beru/BLOC/CustomProviders/userProvider.dart';
 import 'package:beru/CustomFunctions/BeruString.dart';
-import 'package:beru/Responsive/CustomRatio.dart';
 import 'package:beru/Schemas/BeruCategory.dart';
-import 'package:beru/Schemas/Product.dart';
 import 'package:beru/Server/ServerApi.dart';
 import 'package:beru/UI/CommonFunctions/BeruErrorPage.dart';
 import 'package:beru/UI/CommonFunctions/BeruLodingBar.dart';
@@ -23,11 +21,24 @@ class BeruHome extends StatefulWidget {
 }
 
 class _BeruHomeState extends State<BeruHome> with TickerProviderStateMixin {
-  int index = 0;
-  List<ProductSallesStream> streams = [];
   @override
   Widget build(BuildContext context) {
     return checkInterNet(body(context));
+  }
+
+  body(BuildContext context) {
+    return Scaffold(
+        floatingActionButton: FloatingActionButton(
+          backgroundColor: Theme.of(context).primaryColor,
+          onPressed:context.watch<UserState>().signOut,
+          child: Image.asset(
+            'assets/images/logo/logo.png',
+            fit: BoxFit.fill,
+          ),
+        ),
+        floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
+        bottomNavigationBar: BeruBottomNavigator(),
+        body: nestedScrollView());
   }
 
   Consumer getCategory(BuildContext context) {
@@ -100,11 +111,6 @@ class _BeruHomeState extends State<BeruHome> with TickerProviderStateMixin {
     );
   }
 
-  body(BuildContext context) {
-    return Scaffold(
-        bottomNavigationBar: BeruBottomNavigator(), body: nestedScrollView());
-  }
-
   NestedScrollView nestedScrollView() {
     return NestedScrollView(
         headerSliverBuilder: (context, innerBoxIsScrolled) {
@@ -119,7 +125,7 @@ class _BeruHomeState extends State<BeruHome> with TickerProviderStateMixin {
             ),
             SliverToBoxAdapter(
               child: SizedBox.fromSize(
-                size: Size.fromHeight(ResponsiveRatio.getHight(10, context)),
+                size: Size.fromHeight(15),
               ),
             ),
             SliverToBoxAdapter(
@@ -167,7 +173,7 @@ class _BeruHomeState extends State<BeruHome> with TickerProviderStateMixin {
             ),
             SliverToBoxAdapter(
               child: SizedBox.fromSize(
-                size: Size.fromHeight(ResponsiveRatio.getHight(20, context)),
+                size: Size.fromHeight(20),
               ),
             ),
             SliverToBoxAdapter(
@@ -186,14 +192,4 @@ class _BeruHomeState extends State<BeruHome> with TickerProviderStateMixin {
         },
         body: getCategory(context));
   }
-
-  @override
-  void dispose() {
-    streams.forEach((element) {
-      element.dispose();
-    });
-    super.dispose();
-  }
 }
-
-

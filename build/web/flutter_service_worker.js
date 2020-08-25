@@ -3,7 +3,7 @@ const MANIFEST = 'flutter-app-manifest';
 const TEMP = 'flutter-temp-cache';
 const CACHE_NAME = 'flutter-app-cache';
 const RESOURCES = {
-  "assets/AssetManifest.json": "2846b959ab1ec603f8f873da2a8e01ae",
+  "assets/AssetManifest.json": "5bf8acdb1e06defe98d392851829d3f9",
 "assets/assets/fonts/Montserrat-Regular.ttf": "ee6539921d713482b8ccd4d0d23961bb",
 "assets/assets/fonts/SourceSansPro-Regular.ttf": "c1678b46f7dd3f50ceac94ed4e0ad01a",
 "assets/assets/images/logo/logo.png": "b16670812435a3d28450c96deb18c95d",
@@ -11,18 +11,19 @@ const RESOURCES = {
 "assets/assets/images/NoImg.png": "22fa4d91b8a961823a8b2c9d2565a974",
 "assets/assets/images/sex/female.png": "db2263e59eeaf4a6c25503d498e13ec3",
 "assets/assets/images/sex/male.png": "cbf3a638a1a90891c844091fa25671ef",
-"assets/assets/images/socialMedia/facebook.png": "605db29529e0b11f4c251b0b4eb23614",
+"assets/assets/images/socialMedia/beru.png": "d75c631e31d26d4cefdfa04b39e8cd43",
+"assets/assets/images/socialMedia/facebook.png": "abf5e01fa622d6fbe049de264c9c0882",
 "assets/assets/images/socialMedia/google.png": "718d07e9977908379361326981a7d2d4",
-"assets/FontManifest.json": "ad8e18330e0b1d472b1ee76ee278088f",
-"assets/fonts/MaterialIcons-Regular.ttf": "56d3ffdef7a25659eab6a68a3fbfaf16",
-"assets/NOTICES": "fcb954794a51b5a9951ff096a5e566c1",
+"assets/FontManifest.json": "567eb83a2d48bfe124b8797efcbae42b",
+"assets/fonts/MaterialIcons-Regular.otf": "a68d2a28c526b3b070aefca4bac93d25",
+"assets/NOTICES": "43a534e4e7cbef85945d1fb7576ab834",
 "assets/packages/cupertino_icons/assets/CupertinoIcons.ttf": "115e937bb829a890521f72d2e664b632",
 "favicon.png": "5dcef449791fa27946b3d35ad8803796",
 "icons/Icon-192.png": "ac9a721a12bbc803b44f645561ecb1e1",
 "icons/Icon-512.png": "96e752610906ba2a93c65f8abe1645f1",
 "index.html": "16aeed7608ec92a04beb651bec7bf6ee",
 "/": "16aeed7608ec92a04beb651bec7bf6ee",
-"main.dart.js": "6725a34d6c268b710cb79617e04c55b8",
+"main.dart.js": "b0b29f992f86963fe9662ba924872791",
 "manifest.json": "bde4fcc9e9ee4ff1268f08097055ea8b"
 };
 
@@ -40,8 +41,8 @@ const CORE = [
 self.addEventListener("install", (event) => {
   return event.waitUntil(
     caches.open(TEMP).then((cache) => {
-      // Provide a no-cache param to ensure the latest version is downloaded.
-      return cache.addAll(CORE.map((value) => new Request(value, {'cache': 'no-cache'})));
+      // Provide a 'reload' param to ensure the latest version is downloaded.
+      return cache.addAll(CORE.map((value) => new Request(value, {'cache': 'reload'})));
     })
   );
 });
@@ -124,7 +125,7 @@ self.addEventListener("fetch", (event) => {
         // Either respond with the cached resource, or perform a fetch and
         // lazily populate the cache. Ensure the resources are not cached
         // by the browser for longer than the service worker expects.
-        var modifiedRequest = new Request(event.request, {'cache': 'no-cache'});
+        var modifiedRequest = new Request(event.request, {'cache': 'reload'});
         return response || fetch(modifiedRequest).then((response) => {
           cache.put(event.request, response.clone());
           return response;

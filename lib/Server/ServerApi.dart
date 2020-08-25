@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:beru/CustomException/BeruException.dart';
 import 'package:beru/DataStructures/BeruServerError.dart';
 import 'package:beru/Schemas/BeruCategory.dart';
+import 'package:beru/Schemas/Cart.dart';
 import 'package:beru/Schemas/Product.dart';
 import 'package:beru/Schemas/address.dart';
 import 'package:beru/Schemas/user.dart';
@@ -46,7 +47,7 @@ class ServerApi {
       if (e.response.data['data'] == BeruServerErrorStrings.userMustSignUp) {
         throw SighUpNotComplete();
       } else {
-        throw e;
+        throw BeruUnKnownError(error: e.response.data['data'].toString());
       }
     } catch (e) {
       print(e);
@@ -67,7 +68,7 @@ class ServerApi {
       throw e;
     } on DioError catch (e) {
       print(e.response.data['data'].toString() + "dio error");
-      throw e;
+      throw BeruUnKnownError(error: e.response.data['data'].toString());
     } on TimeoutException {
       throw BeruServerError();
     } catch (e) {
@@ -111,7 +112,7 @@ class ServerApi {
     } on TimeoutException {
       throw BeruServerError();
     } catch (e) {
-      print(e);
+      print("Error from serverGetSallesProductByCategory : $e");
       throw e;
     }
   }
@@ -139,6 +140,24 @@ class ServerApi {
           options: Options(
               headers: {"authorization": "Bearer ${await tokenForServer()}"}),
           data: json.encode(data.toMap()));
+      return res.data['data'];
+    } on DioError catch (e) {
+      print(e.response.data['data'].toString() + "dio error");
+      throw BeruUnKnownError(error: e.response.data['data'].toString());
+    } on TimeoutException {
+      throw BeruServerError();
+    } catch (e) {
+      print(e);
+      throw e;
+    }
+  }
+
+  static Future<String> addToCart(Cart cart) async {
+    try {
+      Response res = await _client.post('/customer/cart/add',
+          options: Options(
+              headers: {"authorization": "Bearer ${await tokenForServer()}"}),
+          data: json.encode(cart.toMapCreate()));
       return res.data['data'];
     } on DioError catch (e) {
       print(e.response.data['data'].toString() + "dio error");

@@ -2,6 +2,10 @@ import 'package:flutter/material.dart';
 
 ThemeData defaultTheme = ThemeData(
     primaryColor: Colors.white,
+    backgroundColor: Colors.white,
+    colorScheme: ColorScheme.fromSwatch(
+      backgroundColor: Colors.white,
+    ),
     textTheme: TextTheme(
         caption: TextStyle(
           color: Color(0xffcc8053),

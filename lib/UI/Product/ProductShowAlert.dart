@@ -1,7 +1,11 @@
 import 'package:beru/Responsive/CustomRatio.dart';
+import 'package:beru/Schemas/Cart.dart';
 import 'package:beru/Schemas/Product.dart';
 import 'package:beru/Schemas/Salles.dart';
 import 'package:beru/Server/ServerApi.dart';
+import 'package:beru/Server/ServerWebSocket.dart';
+import 'package:beru/UI/CommonFunctions/BeruAlertWithCallBack.dart';
+import 'package:beru/UI/CommonFunctions/BeruLodingBar.dart';
 import 'package:beru/UI/CommonFunctions/ErrorAlert.dart';
 import 'package:flutter/material.dart';
 import 'package:velocity_x/velocity_x.dart';
@@ -42,7 +46,7 @@ class _ProductShowAlertState extends State<ProductShowAlert> {
             else
               Text("No Quantity Specified"),
             Padding(
-              padding: EdgeInsets.all(ResponsiveRatio.getHight(10, context)),
+              padding: EdgeInsets.all(10),
               child: Container(
                 color: Color(0xffebebeb),
                 height: 2.0,
@@ -186,7 +190,30 @@ class _ProductShowAlertState extends State<ProductShowAlert> {
                 ),
                 if (widget.product.inKg != null)
                   RaisedButton(
-                    onPressed: () {},
+                    onPressed: () async {
+                      showDialog(
+                        context: context,
+                        builder: (context) => beruLoadingBar(),
+                      );
+                      Cart _cart = Cart();
+                      _cart.count = value;
+                      _cart.salles = temp;
+                      _cart.product = widget.product;
+                      print("The data of cart ${_cart.toMapCreate()}");
+                      try {
+                        var res = await ServerApi.addToCart(_cart);
+                        context.pop();
+                        alertWithCallBack(
+                            cakllback: () => context.pop(),
+                            callBackName: "Back",
+                            content: res,
+                            context: context);
+                      } catch (e) {
+                        context.pop();
+                        print("error from add to Cart $e");
+                        errorAlert(context, e.toString());
+                      }
+                    },
                     elevation: 0,
                     child: Text("Cart",
                         style: Theme.of(context).textTheme.subtitle2),
@@ -203,7 +230,7 @@ class _ProductShowAlertState extends State<ProductShowAlert> {
   List<Widget> showProucts(Product product, BuildContext context) {
     return [
       Container(
-        height: context.isMobile ? 70 : 80,
+        height: context.isMobile ? 70 : 100,
         decoration: BoxDecoration(
           color: Colors.white,
           image: DecorationImage(

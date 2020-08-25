@@ -4,7 +4,7 @@ class Salles {
   String _id;
   User seller;
   User farmer;
-  int count;
+  double count;
   
 
   String get id {
@@ -14,12 +14,12 @@ class Salles {
   Salles();
 
   Salles.fromMap(Map<String, dynamic> temp) {
-    this._id = temp['_id'];
+    this._id = temp['_id']??null;
     this.farmer =
         temp['farmer_id'] == null ? null : User.fromMapTest(temp['farmer_id']);
     this.seller =
         temp['seller_id'] == null ? null : User.fromMapTest(temp['seller_id']);
-    this.count = temp['count'];
+    this.count = double.parse(temp['count']);
     
   }
 

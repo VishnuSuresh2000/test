@@ -5,7 +5,7 @@ import 'package:beru/Schemas/Product.dart';
 import 'package:beru/Server/ServerApi.dart';
 import 'package:beru/UI/CommonFunctions/BeruErrorPage.dart';
 import 'package:beru/UI/CommonFunctions/BeruLodingBar.dart';
-import 'package:beru/UI/Home/ProductShowAlert.dart';
+import 'package:beru/UI/Product/ProductShowAlert.dart';
 import 'package:flutter/material.dart';
 import 'package:velocity_x/velocity_x.dart';
 import 'package:provider/provider.dart';

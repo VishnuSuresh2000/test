@@ -1,5 +1,4 @@
 import 'dart:async';
-
 import 'package:beru/Auth/AuthServies.dart';
 import 'package:beru/BLOC/CustomeStream/StreamToCheckRegister.dart';
 import 'package:beru/CustomException/BeruException.dart';
@@ -7,6 +6,7 @@ import 'package:beru/Schemas/address.dart';
 import 'package:beru/Schemas/user.dart';
 import 'package:beru/Server/ServerApi.dart';
 import 'package:beru/UI/CommonFunctions/BeruAlertWithCallBack.dart';
+import 'package:beru/UI/CommonFunctions/BeruLodingBar.dart';
 import 'package:beru/UI/CommonFunctions/ErrorAlert.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -167,19 +167,20 @@ class UserState extends ChangeNotifier {
       if (!serverSignUpSbub.isPaused) {
         serverSignUpSbub.pause();
       }
-      // if (firebaseSignUpSbub.isPaused) {
-      //   print("firebase Stream is called");
-      //   firebaseSignUpSbub.resume();
-      // }
       notifyListeners();
     });
   }
 
   Function siginInFirebase(String mode, BuildContext context) {
     return () async {
+      showDialog(
+        context: context,
+        builder: (context) => beruLoadingBar(),
+      );
       try {
         if (mode == "google") {
           if (await AuthServies().signinWithGoogle()) {
+            Navigator.of(context).pop();
             alertWithCallBack(
                 context: context,
                 content: "Sign Up Completed",
@@ -190,17 +191,25 @@ class UserState extends ChangeNotifier {
                 });
           }
         } else {
+          Navigator.of(context).pop();
           print("$mode is not created yet");
+          errorAlert(context, "$mode is not created yet");
         }
       } catch (e) {
+        Navigator.of(context).pop();
         print("Error from siginInFirebase $e");
       }
     };
   }
 
   void registerToServer(BuildContext context) async {
+    showDialog(
+      context: context,
+      builder: (context) => beruLoadingBar(),
+    );
     try {
       var res = await ServerApi.serverCreateUser(_user);
+      Navigator.of(context).pop();
       alertWithCallBack(
           context: context,
           content: res.toString(),
@@ -211,6 +220,7 @@ class UserState extends ChangeNotifier {
           });
     } catch (e) {
       print("Error from siginInFirebase $e");
+      Navigator.of(context).pop();
       errorAlert(context, e.toString());
     }
   }
@@ -235,9 +245,14 @@ class UserState extends ChangeNotifier {
   }
 
   void addAddressToUser(Address address, BuildContext context) async {
+    showDialog(
+      context: context,
+      builder: (context) => beruLoadingBar(),
+    );
     try {
       print("called the function add address");
       var res = await ServerApi.addAddress(address);
+      Navigator.of(context).pop();
       alertWithCallBack(
           context: context,
           content: res.toString(),
@@ -248,6 +263,7 @@ class UserState extends ChangeNotifier {
             Navigator.of(context).pop();
           });
     } catch (e) {
+      Navigator.of(context).pop();
       print("Error from siginInFirebase $e");
       errorAlert(context, e.toString());
     }

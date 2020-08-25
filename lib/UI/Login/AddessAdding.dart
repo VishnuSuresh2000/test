@@ -79,17 +79,6 @@ class _BeruAdddressAddingState extends State<BeruAdddressAdding> {
                             _userAddress.locality = value;
                           },
                         ),
-                        // spaceingWidget(),
-                        // TextFormField(
-                        //   autofocus: true,
-                        //   // controller: _controllerForFirstName,
-                        //   style: style,
-                        //   decoration: textFormFieldDecoration(hintText: "City"),
-                        //   validator: textFormFieldStringValidator(field: "City"),
-                        //   onSaved: (String value) {
-                        //     _userAddress.city = value;
-                        //   },
-                        // ),
                         spaceingWidget(),
                         TextFormField(
                           autofocus: true,
