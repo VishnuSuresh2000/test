@@ -61,7 +61,7 @@ class BlocForCategory extends ChangeNotifier {
         webSocketControl();
       }, onDone: () {
         print("canceled the Stream in Listern Category");
-        webSocketControl();
+        // webSocketControl();
       });
     } catch (e) {
       print("Category webSocketControl error $e");

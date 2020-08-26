@@ -115,6 +115,7 @@ class _ShowProductsState extends State<ShowProducts> {
 
   @override
   void dispose() {
+   
     super.dispose();
     _productSallesStream.dispose();
   }

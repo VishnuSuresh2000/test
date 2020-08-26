@@ -28,14 +28,20 @@ class ProductSallesStream {
     try {
       var dataRes =
           await ServerApi.serverGetSallesProductByCategory(category.id);
-      _controller.sink.add(dataRes);
+      if (_controller.hasListener) {
+        _controller.sink.add(dataRes);
+      }
     } on BeruNoProductForSalles catch (e) {
       print("Error from Product stream ${e.toString()}");
-      _controller.sink.addError(e);
+      if (_controller.hasListener) {
+        _controller.sink.addError(e);
+      }
     } catch (e) {
-      _controller.sink.addError(e);
       print("Error from Product stream ${e.toString()}");
-      getDataFromServer();
+      if (_controller.hasListener) {
+        _controller.sink.addError(e);
+        getDataFromServer();
+      }
     }
   }
 
@@ -44,7 +50,8 @@ class ProductSallesStream {
   }
 
   void dispose() async {
-    await _controller.close();
+    _controller.sink.close();
+    _controller.close();
     if (_sub != null) {
       _sub.cancel();
     }
@@ -68,7 +75,7 @@ class ProductSallesStream {
         webSocketControl();
       }, onDone: () {
         print("On done the Stream in Listern product");
-        webSocketControl();
+        // webSocketControl();
       });
     } catch (e) {
       print("From webSocketControl product error $e");

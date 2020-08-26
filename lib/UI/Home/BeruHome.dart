@@ -9,7 +9,8 @@ import 'package:beru/UI/CommonFunctions/BeruLodingBar.dart';
 import 'package:beru/UI/Home/BeruBottomNavigator.dart';
 import 'package:beru/UI/InterNetConectivity/CheckConnectivity.dart';
 import 'package:beru/UI/Product/ShowProduct.dart';
-import 'package:carousel_slider/carousel_slider.dart';
+import 'package:beru/main.dart';
+import 'package:carousel_pro/carousel_pro.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:velocity_x/velocity_x.dart';
@@ -23,14 +24,21 @@ class BeruHome extends StatefulWidget {
 class _BeruHomeState extends State<BeruHome> with TickerProviderStateMixin {
   @override
   Widget build(BuildContext context) {
-    return checkInterNet(body(context));
+    return WillPopScope(
+        onWillPop: () {
+          print("Wiillpop executed");
+          globalClose();
+          return Future.value(false);
+        },
+        child: checkInterNet(body(context)));
   }
 
   body(BuildContext context) {
     return Scaffold(
+        backgroundColor: Theme.of(context).backgroundColor,
         floatingActionButton: FloatingActionButton(
           backgroundColor: Theme.of(context).primaryColor,
-          onPressed:context.watch<UserState>().signOut,
+          onPressed: context.watch<UserState>().signOut,
           child: Image.asset(
             'assets/images/logo/logo.png',
             fit: BoxFit.fill,
@@ -51,23 +59,23 @@ class _BeruHomeState extends State<BeruHome> with TickerProviderStateMixin {
             errMsg: value.data.error.toString(),
           );
         } else {
-          return GridView.builder(
-            padding: EdgeInsets.symmetric(horizontal: 20, vertical: 15),
-            itemCount: value.data.list.length,
-            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: context.isMobile ? 2 : 6,
-                crossAxisSpacing: 20,
-                childAspectRatio: 1.2,
-                mainAxisSpacing: 20),
-            itemBuilder: (context, index) =>
-                showCategory(value.data.list[index], context),
+          return GridView.count(
+            padding: EdgeInsets.symmetric(horizontal: 20),
+            crossAxisCount: 2,
+            primary: false,
+            shrinkWrap: true,
+            crossAxisSpacing: 10.0,
+            mainAxisSpacing: 15.0,
+            childAspectRatio: 1,
+            children:
+                value.data.list.map((e) => showCategory(e, context)).toList(),
           );
         }
       },
     );
   }
 
-  showCategory(BeruCategory e, BuildContext context) {
+  Widget showCategory(BeruCategory e, BuildContext context) {
     return Selector<BloCForHome, Function>(
       shouldRebuild: (previous, next) => false,
       selector: (_, handler) => handler.setCategory,
@@ -78,11 +86,11 @@ class _BeruHomeState extends State<BeruHome> with TickerProviderStateMixin {
             context.nav.pushNamed(ShowProducts.route);
           },
           child: Card(
-            elevation: 5,
+            elevation: 3,
             shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.all(Radius.circular(20))),
+                borderRadius: BorderRadius.all(Radius.circular(4))),
             child: Column(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Flexible(
                     flex: 2,
@@ -101,7 +109,10 @@ class _BeruHomeState extends State<BeruHome> with TickerProviderStateMixin {
                     flex: 1,
                     child: Text(
                       "${firstToUpperCaseString(e.name)}",
-                      style: Theme.of(context).textTheme.subtitle1,
+                      style: Theme.of(context)
+                          .textTheme
+                          .bodyText1
+                          .copyWith(fontSize: 10),
                     ))
               ],
             ),
@@ -121,72 +132,96 @@ class _BeruHomeState extends State<BeruHome> with TickerProviderStateMixin {
               ),
               centerTitle: true,
               pinned: true,
-              title: Text("Beru"),
-            ),
-            SliverToBoxAdapter(
-              child: SizedBox.fromSize(
-                size: Size.fromHeight(15),
+              collapsedHeight: 120,
+              title: Text(
+                "Beru",
               ),
-            ),
-            SliverToBoxAdapter(
-              child: Padding(
-                padding:
-                    EdgeInsets.symmetric(horizontal: context.isMobile ? 0 : 20),
-                child: Container(
-                  decoration: BoxDecoration(
-                      shape: BoxShape.rectangle,
-                      borderRadius: BorderRadius.all(Radius.circular(20))),
-                  child: CarouselSlider(
-                    options: CarouselOptions(
-                      aspectRatio: context.isMobile ? 2.8 : 9,
-                      viewportFraction: context.isMobile ? 0.85 : 0.35,
-                      enableInfiniteScroll: true,
-                      reverse: false,
-                      autoPlay: true,
-                      autoPlayInterval: Duration(seconds: 3),
-                      autoPlayAnimationDuration: Duration(milliseconds: 800),
-                      autoPlayCurve: Curves.fastOutSlowIn,
-                      enlargeCenterPage: context.isMobile ? true : false,
-                      scrollDirection: Axis.horizontal,
+              actions: [
+                Padding(
+                  padding: const EdgeInsets.only(right: 10.0),
+                  child: Icon(
+                    Icons.shopping_cart,
+                  ),
+                )
+              ],
+              // expandedHeight: 120,
+              flexibleSpace: Align(
+                alignment: Alignment.bottomCenter,
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 20,
+                    vertical: 20
+                  ),
+                  child: SizedBox(
+                    height: 30,
+                    child: Material(
+                      color: Theme.of(context).primaryColor,
+                      borderRadius: BorderRadius.circular(4.0),
+                      elevation: 5,
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          'search'
+                              .text
+                              .textStyle(Theme.of(context)
+                                  .textTheme
+                                  .caption
+                                  .copyWith(
+                                      fontSize: 10,
+                                      fontWeight: FontWeight.normal))
+                              .make()
+                              .pOnly(left: 10),
+                          Icon(
+                            Icons.search,
+                            color: Theme.of(context).iconTheme.color,
+                          ).pOnly(right: 10)
+                        ],
+                      ),
                     ),
-                    items: [1, 2, 3, 4, 5].map(
-                      (i) {
-                        return Card(
-                            margin: EdgeInsets.symmetric(
-                                horizontal: context.isMobile ? 0 : 20),
-                            elevation: 5,
-                            color: Colors.blueAccent,
-                            child: Container(
-                              width: MediaQuery.of(context).size.width,
-                              child: Center(
-                                child: Text(
-                                  'text $i',
-                                  style: TextStyle(fontSize: 16.0),
-                                ),
-                              ),
-                            ));
-                      },
-                    ).toList(),
                   ),
                 ),
               ),
             ),
             SliverToBoxAdapter(
-              child: SizedBox.fromSize(
-                size: Size.fromHeight(20),
-              ),
-            ),
-            SliverToBoxAdapter(
-              child: Padding(
-                padding: EdgeInsets.symmetric(horizontal: 20),
-                child: Text(
-                  "Shop by Catagory",
-                  style: Theme.of(context)
-                      .textTheme
-                      .subtitle2
-                      .copyWith(fontWeight: FontWeight.bold),
+              child: SizedBox(
+                width: double.infinity,
+                height: 150,
+                child: Carousel(
+                  images: [
+                    NetworkImage(
+                        'https://media.gettyimages.com/photos/colorful-fresh-organic-vegetables-picture-id882314812'),
+                    NetworkImage(
+                        'https://previews.123rf.com/images/puhhha/puhhha1805/puhhha180500313/100520940-healthy-food-fresh-organic-vegetables-on-white-wooden-background-high-resolution.jpg'),
+                    NetworkImage(
+                        'https://previews.123rf.com/images/puhhha/puhhha1805/puhhha180500313/100520940-healthy-food-fresh-organic-vegetables-on-white-wooden-background-high-resolution.jpg'),
+                    NetworkImage(
+                        'https://media.gettyimages.com/photos/colorful-fresh-organic-vegetables-picture-id882314812')
+                  ],
+                  dotSize: 4.0,
+                  dotSpacing: 15.0,
+                  dotColor: Colors.lightGreenAccent,
+                  indicatorBgPadding: 2.0,
+                  dotBgColor: Colors.transparent,
+                  //borderRadius: true,
+                  moveIndicatorFromBottom: 180.0,
+                  noRadiusForIndicator: true,
                 ),
               ),
+            ),
+            SliverPadding(
+              sliver: SliverToBoxAdapter(
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text('Shop by category',
+                        style: Theme.of(context).textTheme.bodyText1),
+                    Text('View all',
+                        style: Theme.of(context).textTheme.bodyText1.copyWith(
+                            fontSize: 8, fontWeight: FontWeight.normal)),
+                  ],
+                ),
+              ),
+              padding: EdgeInsets.symmetric(horizontal: 20, vertical: 20),
             )
           ];
         },
