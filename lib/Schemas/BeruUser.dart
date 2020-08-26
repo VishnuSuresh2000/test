@@ -1,7 +1,7 @@
 import 'package:beru/CustomFunctions/BeruString.dart';
 import 'package:beru/Schemas/address.dart';
 
-class User {
+class BeruUser {
   String firstName;
 
  
@@ -24,8 +24,8 @@ class User {
     this._id = id;
   }
 
-  User();
-  User.fromMap(Map<String, dynamic> data) {
+  BeruUser();
+  BeruUser.fromMap(Map<String, dynamic> data) {
     this.firstName = data['firstName'] ?? null;
     this.lastName = data['lastName'] ?? null;
     this.phoneNumber = data['phoneNumber'] ?? null;
@@ -34,7 +34,7 @@ class User {
         data['address'] == null ? null : Address.fromMap(data['address']);
     this.email = data['email'] ?? null;
   }
-  User.fromMapTest(Map<String, dynamic> data) {
+  BeruUser.fromMapTest(Map<String, dynamic> data) {
     this.firstName = data['firstName'] ?? null;
     this.lastName = data['lastName'] ?? null;
     this.phoneNumber = data['phoneNumber'] ?? null;
@@ -55,7 +55,7 @@ class User {
     };
   }
 
-  Map<String, dynamic> toMapForUserRegister() {
+  Map<String, dynamic> toMapForBUserRegister() {
     return {
       'firstName': this.firstName ?? null,
       'lastName': this.lastName ?? null,

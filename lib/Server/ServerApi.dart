@@ -6,7 +6,7 @@ import 'package:beru/Schemas/BeruCategory.dart';
 import 'package:beru/Schemas/Cart.dart';
 import 'package:beru/Schemas/Product.dart';
 import 'package:beru/Schemas/address.dart';
-import 'package:beru/Schemas/user.dart';
+import 'package:beru/Schemas/BeruUser.dart';
 import 'package:dio/dio.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
@@ -24,10 +24,8 @@ class ServerApi {
   static Dio _client = Dio(_options);
 
   static tokenForServer() async {
-    if (await FirebaseAuth.instance.currentUser() != null) {
-      return (await (await FirebaseAuth.instance.currentUser())
-              .getIdToken(refresh: true))
-          .token;
+    if (FirebaseAuth.instance.currentUser != null) {
+      return await FirebaseAuth.instance.currentUser.getIdToken(true);
     } else {
       throw NoUserException();
     }
@@ -55,12 +53,12 @@ class ServerApi {
     }
   }
 
-  static serverCreateUser(User user) async {
+  static serverCreateUser(BeruUser user) async {
     try {
       print(user.toMap());
       var head = "Bearer ${await tokenForServer()}";
       Response res = await _client.post('/customer/create',
-          data: jsonEncode(user.toMapForUserRegister()),
+          data: jsonEncode(user.toMapForBUserRegister()),
           options: Options(headers: {"authorization": head}));
       return res.data['data'];
     } on NoUserException catch (e) {

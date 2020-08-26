@@ -3,7 +3,7 @@ import 'package:beru/Auth/AuthServies.dart';
 import 'package:beru/BLOC/CustomeStream/StreamToCheckRegister.dart';
 import 'package:beru/CustomException/BeruException.dart';
 import 'package:beru/Schemas/address.dart';
-import 'package:beru/Schemas/user.dart';
+import 'package:beru/Schemas/BeruUser.dart';
 import 'package:beru/Server/ServerApi.dart';
 import 'package:beru/UI/CommonFunctions/BeruAlertWithCallBack.dart';
 import 'package:beru/UI/CommonFunctions/BeruLodingBar.dart';
@@ -12,10 +12,10 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 class UserState extends ChangeNotifier {
-  final User _user = User();
+  final BeruUser _user = BeruUser();
   final BeruRegister register = BeruRegister();
   StreamSubscription<bool> serverSignUpSbub;
-  StreamSubscription<FirebaseUser> firebaseSignUpSbub;
+  StreamSubscription<User> firebaseSignUpSbub;
 
   bool userFirbase;
   bool userSignUp;
@@ -30,12 +30,11 @@ class UserState extends ChangeNotifier {
 
   void autoUserStatusCheck() {
     firebaseSignUpSbub =
-        FirebaseAuth.instance.onAuthStateChanged.listen((event) async {
+        FirebaseAuth.instance.authStateChanges().listen((event) async {
       print("From Firbase Stream init $event");
       if (event != null) {
         print("Data  ${event.displayName ?? null}");
         userFirbase = true;
-
         if (serverSignUpSbub == null) {
           print("init the server check stream");
           checkUserInServer();
@@ -101,18 +100,18 @@ class UserState extends ChangeNotifier {
     notifyListeners();
   }
 
-  User get user {
+  BeruUser get user {
     return _user;
   }
 
-  void setTempData() async {
+  void setTempData() {
     // print("setTemoData");
     if (userFirbase != null &&
         userFirbase &&
         userSignUp != null &&
         !userSignUp) {
       // print("setTemoData accesed condition");
-      var user = await FirebaseAuth.instance.currentUser();
+      var user = FirebaseAuth.instance.currentUser;
       _user.firstName = user.displayName.split(' ')[0] ?? null;
       _user.lastName = user.displayName.split(' ')[1] ?? null;
       _user.email = user.email;

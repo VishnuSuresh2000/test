@@ -32,7 +32,7 @@ class BeruRegister {
   void setUp() async {
     print("called Server check function setUp");
     try {
-      var user = await FirebaseAuth.instance.currentUser();
+      var user = FirebaseAuth.instance.currentUser;
       if (user != null) {
         if (await ServerApi.serverCheckIfExist()) {
           registerController.sink.add(true);

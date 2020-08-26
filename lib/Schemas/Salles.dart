@@ -1,9 +1,9 @@
-import 'package:beru/Schemas/user.dart';
+import 'package:beru/Schemas/BeruUser.dart';
 
 class Salles {
   String _id;
-  User seller;
-  User farmer;
+  BeruUser seller;
+  BeruUser farmer;
   double count;
   
 
@@ -16,9 +16,9 @@ class Salles {
   Salles.fromMap(Map<String, dynamic> temp) {
     this._id = temp['_id']??null;
     this.farmer =
-        temp['farmer_id'] == null ? null : User.fromMapTest(temp['farmer_id']);
+        temp['farmer_id'] == null ? null : BeruUser.fromMapTest(temp['farmer_id']);
     this.seller =
-        temp['seller_id'] == null ? null : User.fromMapTest(temp['seller_id']);
+        temp['seller_id'] == null ? null : BeruUser.fromMapTest(temp['seller_id']);
     this.count = double.parse(temp['count']);
     
   }

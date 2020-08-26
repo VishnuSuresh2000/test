@@ -1,9 +1,9 @@
+import 'dart:async';
 import 'package:beru/CustomException/BeruException.dart';
 import 'package:beru/Schemas/BeruCategory.dart';
 import 'package:beru/Server/ServerApi.dart';
 import 'package:beru/Server/ServerWebSocket.dart';
 import 'package:flutter/material.dart';
-import 'package:web_socket_channel/web_socket_channel.dart';
 
 class StreamOutCategory {
   List<BeruCategory> list;
@@ -16,7 +16,8 @@ class StreamOutCategory {
 
 class BlocForCategory extends ChangeNotifier {
   StreamOutCategory data = StreamOutCategory();
-  WebSocketChannel channel;
+  Stream _channel;
+  StreamSubscription _sub;
 
   BlocForCategory() : super() {
     setData();
@@ -45,30 +46,32 @@ class BlocForCategory extends ChangeNotifier {
 
   void webSocketControl() {
     try {
-      channel = serverSocket('sync');
-      channel.stream.listen((event) {
-        if (event == categorySec) {
+      print("Category webSocketControl called");
+      if (_sub != null) {
+        print("Category Socket sub alredy exist");
+        _sub.cancel();
+      }
+      _channel = ServerSocket.socketStream;
+      _sub = _channel.listen((event) {
+        if (event == ServerSocket.categorySec) {
           setData();
         }
       }, onError: (error) {
-        print("From lisenetr error $error");
+        print("From lisenetr Category error $error");
+        webSocketControl();
       }, onDone: () {
         print("canceled the Stream in Listern Category");
         webSocketControl();
       });
     } catch (e) {
-      print("From Stream Category outside error $e");
+      print("Category webSocketControl error $e");
       webSocketControl();
     }
   }
 
-
-
   @override
   void dispose() {
-    if (channel != null) {
-      channel.sink.close();
-    }
+    _sub.cancel();
     super.dispose();
   }
 }

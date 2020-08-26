@@ -25,14 +25,18 @@ class _BeruLoginState extends State<BeruLogin> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Flexible(
-                    child: Image.asset('assets/images/logo/logo.png'),
+                    child: Image.asset(
+                      'assets/images/logo/logo.png',
+                      height: 70,
+                    ),
+                    fit: FlexFit.tight,
                     flex: 2,
                   ),
                   Flexible(
                     child: Text(
                       "Welcome to Beru",
-                      style: GoogleFonts.lato(
-                          fontSize: 30.0, fontWeight: FontWeight.bold),
+                      style: GoogleFonts.openSans(
+                          fontSize: 16.0, fontWeight: FontWeight.bold),
                     ),
                     flex: 1,
                   ),
@@ -88,14 +92,15 @@ class _BeruLoginState extends State<BeruLogin> {
                     child: SizedBox(
                       width: 250,
                       child: StyledText(
+                        textAlign: TextAlign.center,
                         text:
                             '<lato>By continuing, you agree to Beru\'s <bold> Terms of Service </bold>  and <bold> privacy policy </bold> </lato>',
                         styles: {
-                          'lato': GoogleFonts.lato(
-                            fontSize: 12.0,
+                          'lato': GoogleFonts.openSans(
+                            fontSize: 10.0,
                           ),
-                          'bold': GoogleFonts.lato(
-                              fontSize: 12.0, fontWeight: FontWeight.bold),
+                          'bold': GoogleFonts.openSans(
+                              fontSize: 10.0, fontWeight: FontWeight.bold),
                         },
                       ),
                     ),
@@ -113,7 +118,7 @@ class _BeruLoginState extends State<BeruLogin> {
   Flexible spacingFactor() {
     return Flexible(
       fit: FlexFit.loose,
-      child: 25.heightBox,
+      child: 17.heightBox,
       flex: 1,
     );
   }
@@ -139,32 +144,30 @@ class LoginButton extends StatelessWidget {
       child: InkWell(
         onTap: callBack,
         child: Container(
+          height: 45,
           decoration: BoxDecoration(
               color: background,
               shape: BoxShape.rectangle,
               border: Border.all(
-                  color: boderColorShow ? Colors.black : Colors.transparent),
+                  width: 1,
+                  color:
+                      boderColorShow ? Color(0xff4B4B4B) : Colors.transparent),
               borderRadius: BorderRadius.all(Radius.circular(10.0))),
           child: Row(
-            mainAxisAlignment: MainAxisAlignment.start,
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 15),
-                child: Image.asset(
-                  'assets/images/socialMedia/$text.png',
-                  scale: scaleValue,
-                ),
+              Image.asset(
+                'assets/images/socialMedia/$text.png',
+                scale: scaleValue,
               ),
-              AspectRatio(aspectRatio: 0.5),
-              Text(
-                'Continue with ${text.firstLetterUpperCase()}',
-                style: GoogleFonts.lato(
-                        fontSize: 13.0, fontWeight: FontWeight.bold)
-                    .copyWith(
-                        color: text == "facebook"
-                            ? Colors.white
-                            : Theme.of(context).textTheme.bodyText1.color),
-              ),
+              Text('Continue with ${text.firstLetterUpperCase()}',
+                  style: GoogleFonts.openSans(
+                          fontSize: 14.0, fontWeight: FontWeight.bold)
+                      .copyWith(
+                          color: text == "facebook"
+                              ? Colors.white
+                              : Theme.of(context).textTheme.bodyText1.color)),
+              10.widthBox
             ],
           ),
         ),

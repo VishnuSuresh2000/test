@@ -5,14 +5,14 @@ import 'package:beru/Schemas/BeruCategory.dart';
 import 'package:beru/Schemas/Product.dart';
 import 'package:beru/Server/ServerApi.dart';
 import 'package:beru/Server/ServerWebSocket.dart';
-import 'package:web_socket_channel/web_socket_channel.dart';
 
 class ProductSallesStream {
   StreamController<List<Product>> _controller = StreamController<List<Product>>(
     onCancel: () {},
   );
   BeruCategory category;
-  WebSocketChannel channel;
+  Stream _channel;
+  StreamSubscription _sub;
 
   ProductSallesStream() {
     webSocketControl();
@@ -21,7 +21,6 @@ class ProductSallesStream {
   void init({BeruCategory category}) {
     this.category = category;
     getDataFromServer();
-   
   }
 
   void getDataFromServer() async {
@@ -46,29 +45,33 @@ class ProductSallesStream {
 
   void dispose() async {
     await _controller.close();
-    if (channel != null) {
-      channel.sink.close();
+    if (_sub != null) {
+      _sub.cancel();
     }
   }
 
   void webSocketControl() {
     try {
-      channel = serverSocket('sync');
-      channel.stream.listen((event) {
-        if (event == sallesSec) {
-          print("Salles Web Socket get Data");
+      print("Product webSocketControl called");
+      if (_sub != null) {
+        print("Product Socket sub alredy exist");
+        _sub.cancel();
+      }
+      _channel = ServerSocket.socketStream;
+      _sub = _channel.listen((event) {
+        if (event == ServerSocket.sallesSec) {
+          print("Socket Product get Data");
           getDataFromServer();
         }
       }, onError: (error) {
         print("From lisenetr error $error");
-        // _controller.sink.addError(Exception("Error from websocket $error"));
+        webSocketControl();
       }, onDone: () {
-        print("canceled the Stream in Listern product");
+        print("On done the Stream in Listern product");
         webSocketControl();
       });
     } catch (e) {
-      print("From Stream outside error $e");
-      // _controller.sink.addError(Exception("Error from websocket outside $e"));
+      print("From webSocketControl product error $e");
       webSocketControl();
     }
   }
