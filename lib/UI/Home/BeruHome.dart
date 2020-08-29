@@ -62,7 +62,7 @@ class _BeruHomeState extends State<BeruHome> with TickerProviderStateMixin {
         } else {
           return GridView.count(
             padding: EdgeInsets.symmetric(horizontal: 20),
-            crossAxisCount: 2,
+            crossAxisCount: context.isMobile?2:6,
             primary: false,
             shrinkWrap: true,
             crossAxisSpacing: 10.0,

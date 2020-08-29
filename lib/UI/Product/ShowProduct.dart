@@ -120,7 +120,7 @@ class _ShowProductsState extends State<ShowProducts>
                   SliverPadding(
                     padding: EdgeInsets.symmetric(horizontal: 10, vertical: 10),
                     sliver: SliverGrid.count(
-                      crossAxisCount: 2,
+                      crossAxisCount: context.isMobile ? 2 : 6,
                       crossAxisSpacing: 10,
                       mainAxisSpacing: 10,
                       childAspectRatio: 0.8,
