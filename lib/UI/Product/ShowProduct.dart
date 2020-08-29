@@ -303,7 +303,7 @@ class _ShowProductsState extends State<ShowProducts>
                                   child: IconButton(
                                       icon: Icon(
                                         Icons.remove,
-                                        size: 10,
+                                        size: 13,
                                       ),
                                       onPressed: () {
                                         double comput =
@@ -359,7 +359,7 @@ class _ShowProductsState extends State<ShowProducts>
                               ),
                               Flexible(
                                   child: IconButton(
-                                      icon: Icon(Icons.add, size: 10),
+                                      icon: Icon(Icons.add, size: 13),
                                       onPressed: () {
                                         double comput =
                                             double.parse(_controller.text) +
@@ -378,7 +378,7 @@ class _ShowProductsState extends State<ShowProducts>
             Flexible(
                 flex: 1,
                 child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
                   children: [
                     Flexible(
                       child: Row(
