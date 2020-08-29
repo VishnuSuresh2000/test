@@ -6,46 +6,48 @@ import 'package:beru/Schemas/Product.dart';
 import 'package:beru/Server/ServerApi.dart';
 import 'package:beru/Server/ServerWebSocket.dart';
 
+class SallesData {
+  List<Product> data;
+  final bool hasError;
+  Exception error;
+
+  SallesData({this.hasError, this.data, this.error});
+}
+
 class ProductSallesStream {
-  StreamController<List<Product>> _controller = StreamController<List<Product>>(
-    onCancel: () {},
-  );
-  BeruCategory category;
+  StreamController<SallesData> _controller =
+      StreamController<SallesData>(sync: true);
   Stream _channel;
   StreamSubscription _sub;
 
   ProductSallesStream() {
     webSocketControl();
-  }
-
-  void init({BeruCategory category}) {
-    this.category = category;
     getDataFromServer();
   }
 
   void getDataFromServer() async {
     print("called get Data from server");
     try {
-      var dataRes =
-          await ServerApi.serverGetSallesProductByCategory(category.id);
+      var dataRes = await ServerApi.serverGetSallesProduct();
       if (_controller.hasListener) {
-        _controller.sink.add(dataRes);
+        _controller.sink
+            .add(SallesData(hasError: false, data: dataRes, error: null));
       }
     } on BeruNoProductForSalles catch (e) {
       print("Error from Product stream ${e.toString()}");
       if (_controller.hasListener) {
-        _controller.sink.addError(e);
+        _controller.sink..add(SallesData(hasError: true, data: null, error: e));
       }
     } catch (e) {
       print("Error from Product stream ${e.toString()}");
       if (_controller.hasListener) {
-        _controller.sink.addError(e);
-        getDataFromServer();
+        _controller.sink..add(SallesData(hasError: true, data: null, error: e));
       }
+      getDataFromServer();
     }
   }
 
-  Stream<List<Product>> get stream {
+  Stream<SallesData> get stream {
     return _controller.stream;
   }
 

@@ -12,12 +12,11 @@ class Product {
   List<Salles> salles;
   Map<String, dynamic> toMap() {
     return {
-      '_id': _id,
       "name": name,
       "description": description,
       'category': category.toMap(),
       'inKg': inKg,
-      'amount': amount
+      'amount': amount,
     };
   }
 
@@ -25,17 +24,19 @@ class Product {
 
   Product.fromMap(Map<String, dynamic> temp) {
     this.hasImg = temp['hasImg'] ?? false;
-    this._id = temp['_id'];
-    this.name = temp['name'];
-    this.description = temp['description'];
-    this.category = temp['category'] is String
-        ? BeruCategory.fromMap({"_id": temp['category']})
-        : BeruCategory.fromMap(temp['category']);
-    this.inKg = temp['inKg'];
+    this._id = temp['_id'] ?? null;
+    this.name = temp['name'] ?? null;
+    this.description = temp['description'] ?? null;
+    if (temp['category'] is String) {
+      this.category = BeruCategory.fromMap({"_id": temp['category']});
+    } else if (temp['category'] is Map) {
+      this.category = BeruCategory.fromMap(temp['category']);
+    }
+    this.inKg = temp['inKg'] ?? null;
     this.salles = temp['salles'] == null
         ? null
         : Salles.fromMapToListOfSalles(temp['salles']);
-    this.amount = temp['amount'];
+    this.amount = temp['amount'] ?? null;
   }
 
   String get id {

@@ -7,6 +7,7 @@ import 'package:beru/Server/ServerApi.dart';
 import 'package:beru/UI/CommonFunctions/BeruErrorPage.dart';
 import 'package:beru/UI/CommonFunctions/BeruLodingBar.dart';
 import 'package:beru/UI/Home/BeruBottomNavigator.dart';
+import 'package:beru/UI/Home/BeruSerach.dart';
 import 'package:beru/UI/InterNetConectivity/CheckConnectivity.dart';
 import 'package:beru/UI/Product/ShowProduct.dart';
 import 'package:beru/main.dart';
@@ -132,7 +133,7 @@ class _BeruHomeState extends State<BeruHome> with TickerProviderStateMixin {
               ),
               centerTitle: true,
               pinned: true,
-              collapsedHeight: 120,
+              collapsedHeight: 110,
               title: Text(
                 "Beru",
               ),
@@ -152,40 +153,14 @@ class _BeruHomeState extends State<BeruHome> with TickerProviderStateMixin {
                     horizontal: 20,
                     vertical: 20
                   ),
-                  child: SizedBox(
-                    height: 30,
-                    child: Material(
-                      color: Theme.of(context).primaryColor,
-                      borderRadius: BorderRadius.circular(4.0),
-                      elevation: 5,
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          'search'
-                              .text
-                              .textStyle(Theme.of(context)
-                                  .textTheme
-                                  .caption
-                                  .copyWith(
-                                      fontSize: 10,
-                                      fontWeight: FontWeight.normal))
-                              .make()
-                              .pOnly(left: 10),
-                          Icon(
-                            Icons.search,
-                            color: Theme.of(context).iconTheme.color,
-                          ).pOnly(right: 10)
-                        ],
-                      ),
-                    ),
-                  ),
+                  child:BeruSearchBar(),
                 ),
               ),
             ),
             SliverToBoxAdapter(
               child: SizedBox(
                 width: double.infinity,
-                height: 150,
+                height: 120,
                 child: Carousel(
                   images: [
                     NetworkImage(

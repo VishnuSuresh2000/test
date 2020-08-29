@@ -13,7 +13,7 @@ import 'package:flutter/foundation.dart';
 
 class ServerApi {
   static bool offlineOnline = false;
-  static String switchWeb = kIsWeb ? "localhost:80" : "192.168.43.220:80";
+  static String switchWeb = kIsWeb ? "localhost:80" : "192.168.43.144:80";
   static String dns =
       offlineOnline ? "$switchWeb" : "beru-server.herokuapp.com";
   static String url = offlineOnline ? "http://$dns" : "https://$dns";
@@ -81,8 +81,13 @@ class ServerApi {
       List temp = res.data['data'];
       return temp.map((e) => BeruCategory.fromMap(e)).toList();
     } on DioError catch (e) {
-      print(e.response.data['data'].toString() + "dio error");
-      throw BeruUnKnownError(error: e.response.data['data'].toString());
+      if (e.response.data['data'] ==
+              BeruServerErrorStrings.noProductForSalles ||
+          e.response.data['data'] == BeruServerErrorStrings.noRecordFound) {
+        throw BeruNoProductForSalles();
+      } else {
+        throw BeruUnKnownError(error: e.response.data['data'].toString());
+      }
     } on TimeoutException {
       throw BeruServerError();
     } catch (e) {
@@ -91,18 +96,22 @@ class ServerApi {
     }
   }
 
-  static Future<List<Product>> serverGetSallesProductByCategory(
-      String category) async {
+  static Future<List<Product>> serverGetSallesProduct() async {
     try {
-      Response res = await _client.get(
-          '/customer/salles/dataByCategory/$category',
+      Response res = await _client.get('/customer/salles/data',
           options: Options(
               headers: {"authorization": "Bearer ${await tokenForServer()}"}));
+      print("the data from ${res?.data}");
+      if (res?.data['data'] == null) {
+        print("no data get");
+        return await serverGetSallesProduct();
+      }
       List data = res.data['data'];
       return data.map((e) => Product.fromMap(e)).toList();
     } on DioError catch (e) {
       if (e.response.data['data'] ==
-          BeruServerErrorStrings.noProductForSalles) {
+              BeruServerErrorStrings.noProductForSalles ||
+          e.response.data['data'] == BeruServerErrorStrings.noRecordFound) {
         throw BeruNoProductForSalles();
       } else {
         throw BeruUnKnownError(error: e.response.data['data'].toString());
