@@ -1,25 +1,23 @@
 import 'dart:async';
-
 import 'package:beru/CustomException/BeruException.dart';
-import 'package:beru/Schemas/Product.dart';
+import 'package:beru/Schemas/Cart.dart';
 import 'package:beru/Server/ServerApi.dart';
 import 'package:beru/Server/ServerWebSocket.dart';
 
-class SallesData {
-  List<Product> data;
+class CartData {
+  List<Cart> data;
   final bool hasError;
   Exception error;
-
-  SallesData({this.hasError, this.data, this.error});
+  CartData({this.hasError, this.data, this.error});
 }
 
-class ProductSallesStream {
-  StreamController<SallesData> _controller =
-      StreamController<SallesData>(sync: true);
+class CartStream {
+  StreamController<CartData> _controller =
+      StreamController<CartData>(sync: true);
   Stream _channel;
   StreamSubscription _sub;
 
-  ProductSallesStream() {
+  CartStream() {
     webSocketControl();
     getDataFromServer();
   }
@@ -27,20 +25,21 @@ class ProductSallesStream {
   void getDataFromServer() async {
     print("called get Data from server");
     try {
-      var dataRes = await ServerApi.serverGetSallesProduct();
+      var dataRes = await ServerApi.serverGetCart();
+      print("got Data from Cart Data from server $dataRes");
       if (_controller.hasListener) {
         _controller.sink
-            .add(SallesData(hasError: false, data: dataRes, error: null));
+            .add(CartData(hasError: false, data: dataRes, error: null));
       }
     } on BeruNoProductForSalles catch (e) {
-      print("Error from Product stream ${e.toString()}");
+      print("Error from Cart stream ${e.toString()}");
       if (_controller.hasListener) {
-        _controller.sink..add(SallesData(hasError: true, data: null, error: e));
+        _controller.sink..add(CartData(hasError: true, data: null, error: e));
       }
     } catch (e) {
-      print("Error from Product stream ${e.toString()}");
+      print("Error from Cart stream ${e.toString()}");
       if (_controller.hasListener) {
-        _controller.sink.add(SallesData(
+        _controller.sink.add(CartData(
             hasError: true,
             data: null,
             error: e is Exception ? e : BeruUnKnownError(error: e.toString())));
@@ -49,7 +48,7 @@ class ProductSallesStream {
     }
   }
 
-  Stream<SallesData> get stream {
+  Stream<CartData> get stream {
     return _controller.stream;
   }
 
@@ -70,7 +69,7 @@ class ProductSallesStream {
       }
       _channel = ServerSocket.socketStream;
       _sub = _channel.listen((event) {
-        if (event == ServerSocket.sallesSec) {
+        if (event == ServerSocket.cartSec) {
           print("Socket Product get Data");
           getDataFromServer();
         }

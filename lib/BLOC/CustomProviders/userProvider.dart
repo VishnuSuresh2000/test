@@ -31,7 +31,7 @@ class UserState extends ChangeNotifier {
   void autoUserStatusCheck() {
     firebaseSignUpSbub =
         FirebaseAuth.instance.authStateChanges().listen((event) async {
-      print("From Firbase Stream init $event");
+      // print("From Firbase Stream init $event");
       if (event != null) {
         print("Data  ${event.displayName ?? null}");
         userFirbase = true;

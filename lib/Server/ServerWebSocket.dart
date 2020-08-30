@@ -12,6 +12,7 @@ class ServerSocket {
       : "wss://${ServerApi.dns}";
   static const String categorySec = "catogoryTrue";
   static const String sallesSec = "sallesTrue";
+  static const String cartSec = "cartTrue";
   static StreamSubscription _sub;
   static void serverSocket() {
     print("WS chnnel $_url");

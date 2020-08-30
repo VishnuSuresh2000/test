@@ -97,6 +97,7 @@ class ServerApi {
   }
 
   static Future<List<Product>> serverGetSallesProduct() async {
+    print("on the server call of product");
     try {
       Response res = await _client.get('/customer/salles/data',
           options: Options(
@@ -167,12 +168,57 @@ class ServerApi {
           data: json.encode(cart.toMapCreate()));
       return res.data['data'];
     } on DioError catch (e) {
-      print(e.response.data['data'].toString() + "dio error");
+      print(e.response.data['data'].toString() + " dio error");
       throw BeruUnKnownError(error: e.response.data['data'].toString());
     } on TimeoutException {
       throw BeruServerError();
     } catch (e) {
       print(e);
+      throw e;
+    }
+  }
+
+  static Future<Map<String, dynamic>> addMultiProductToCart(
+      List<Cart> carts) async {
+    try {
+      Response res = await _client.post('/customer/cart/addMultiCart',
+          options: Options(
+              headers: {"authorization": "Bearer ${await tokenForServer()}"}),
+          data: json.encode(carts.map((e) => e.toMapCreate()).toList()));
+      print("serverGetCart data : ${res?.data}");
+      return res.data['data'];
+    } on DioError catch (e) {
+      print(e.response.data['data'].toString() + " dio error");
+      throw BeruUnKnownError(error: e.response.data['data'].toString());
+    } on TimeoutException {
+      throw BeruServerError();
+    } catch (e) {
+      print(e);
+      throw e;
+    }
+  }
+
+  static Future<List<Cart>> serverGetCart() async {
+    print("on the server call of product");
+    try {
+      Response res = await _client.get('/customer/cart/data',
+          options: Options(
+              headers: {"authorization": "Bearer ${await tokenForServer()}"}));
+      // print("serverGetCart data : ${res?.data}");
+      List data = res.data['data'];
+      return data.map((e) => Cart.fromMap(e)).toList();
+    } on DioError catch (e) {
+      if (e.response.data['data'] ==
+              BeruServerErrorStrings.noProductForSalles ||
+          e.response.data['data'] == BeruServerErrorStrings.noRecordFound) {
+        throw BeruNoProductForSalles();
+      } else {
+        throw BeruUnKnownError(error: e.response.data['data'].toString());
+      }
+    } on TimeoutException {
+      throw BeruServerError();
+    } catch (e) {
+      print("Error from serverGetCart : $e");
       throw e;
     }
   }

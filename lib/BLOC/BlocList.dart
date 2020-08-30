@@ -2,6 +2,7 @@ import 'package:beru/BLOC/CustomProviders/BLOCForCategory.dart';
 import 'package:beru/BLOC/CustomProviders/BLOCForHome.dart';
 import 'package:beru/BLOC/CustomProviders/BlocForAddToBag.dart';
 import 'package:beru/BLOC/CustomProviders/userProvider.dart';
+import 'package:beru/BLOC/CustomeStream/CartStream.dart';
 import 'package:beru/BLOC/CustomeStream/ProductStream.dart';
 import 'package:connectivity/connectivity.dart';
 import 'package:provider/provider.dart';
@@ -24,7 +25,18 @@ List bloc = <SingleChildWidget>[
       return null;
     },
   ),
-  ChangeNotifierProvider<BlocForAddToBag>(
+  StreamProvider<CartData>(
+    create: (context) => CartStream().stream,
+    catchError: (context, error) {
+      print("Error from ProductSallesStrea init $error");
+      return null;
+    },
+  ),
+  // ChangeNotifierProvider<BlocForAddToBag>(
+  //   create: (context) => BlocForAddToBag(),
+  // )
+  ChangeNotifierProxyProvider<CartData, BlocForAddToBag>(
     create: (context) => BlocForAddToBag(),
+    update: (context, value, previous) => previous..updateCart(value),
   )
 ];

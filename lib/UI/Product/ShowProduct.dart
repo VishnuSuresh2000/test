@@ -9,7 +9,6 @@ import 'package:beru/Schemas/Product.dart';
 import 'package:beru/Server/ServerApi.dart';
 import 'package:beru/UI/CommonFunctions/BeruErrorPage.dart';
 import 'package:beru/UI/CommonFunctions/BeruLodingBar.dart';
-import 'package:beru/UI/CommonFunctions/ErrorAlert.dart';
 import 'package:beru/UI/Home/BeruSerach.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -27,6 +26,8 @@ class _ShowProductsState extends State<ShowProducts>
   BeruCategory category;
   TabController _tabController;
   BlocForCategory blocForCategory;
+  final _scafoldKey = GlobalKey<ScaffoldState>();
+  bool _isSnackbarActive = false;
   @override
   void initState() {
     blocForCategory = context.read<BlocForCategory>() ?? null;
@@ -61,12 +62,15 @@ class _ShowProductsState extends State<ShowProducts>
           -1 + 1;
     }
     return Scaffold(
+      key: _scafoldKey,
       backgroundColor: Theme.of(context).backgroundColor,
       body: Stack(
         children: [
           CustomScrollView(
             slivers: [
               SliverAppBar(
+                pinned: true,
+
                 title: "Beru Community".text.make(),
                 actions: [
                   Padding(
@@ -76,7 +80,8 @@ class _ShowProductsState extends State<ShowProducts>
                     ),
                   )
                 ],
-                expandedHeight: 150,
+                collapsedHeight: 100,
+                // expandedHeight: 150,
                 flexibleSpace: Align(
                   alignment: Alignment.bottomCenter,
                   child: Padding(
@@ -118,7 +123,12 @@ class _ShowProductsState extends State<ShowProducts>
                   )
                 else
                   SliverPadding(
-                    padding: EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+                    padding: EdgeInsets.symmetric(horizontal: 10, vertical: 10)
+                        .add(EdgeInsets.only(
+                            bottom: context.select<BlocForAddToBag, bool>(
+                                    (value) => value.toBuildAddToBag())
+                                ? 70
+                                : 0)),
                     sliver: SliverGrid.count(
                       crossAxisCount: context.isMobile ? 2 : 6,
                       crossAxisSpacing: 10,
@@ -130,8 +140,14 @@ class _ShowProductsState extends State<ShowProducts>
                   )
             ],
           ),
-          Selector<BlocForAddToBag,
-                  Tuple5<Function, Function, Function, Function, Function>>(
+          Selector<
+                  BlocForAddToBag,
+                  Tuple5<
+                      bool Function(),
+                      int Function(),
+                      List<double> Function(),
+                      double Function(),
+                      void Function(BuildContext)>>(
               shouldRebuild: (previous, next) => true,
               builder: (context, value, child) {
                 if (value.item1()) {
@@ -146,67 +162,106 @@ class _ShowProductsState extends State<ShowProducts>
                   handler.getNumberOfiteams,
                   handler.toWeightKg,
                   handler.totalAmount,
-                  handler.test))
+                  handler.addToBagInServer))
         ],
       ),
     );
+  }
+
+  showSnackBarOnPage(String content) {
+    if (mounted) {
+      _isSnackbarActive = true;
+      _scafoldKey.currentState
+          .showSnackBar(SnackBar(
+              behavior: SnackBarBehavior.fixed,
+              // margin: EdgeInsets.symmetric(
+              // vertical: 10
+              // ),
+              backgroundColor: Color(0xff2BC48A),
+              content: SizedBox(
+                // height: 40,
+                child: Text(
+                  content,
+                  style: Theme.of(context).textTheme.bodyText2.copyWith(
+                      fontSize: 14,
+                      color: Colors.white,
+                      fontWeight: FontWeight.w500),
+                ),
+              )))
+          .closed
+          .then((value) {
+        setState(() {
+          _isSnackbarActive = false;
+        });
+      });
+    }
   }
 
   Align bottomBarAddToCart(double totalAmount, List<double> weight,
       int noOfIteams, Function callBack, BuildContext context) {
     return Align(
       alignment: Alignment.bottomCenter,
-      child: SizedBox(
-        height: 70,
-        width: double.infinity,
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 20),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Column(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
+      child: Padding(
+        padding: EdgeInsets.only(bottom: _isSnackbarActive ? 40 : 0),
+        child: Container(
+          color: Theme.of(context).backgroundColor,
+          child: SizedBox(
+            height: 70,
+            width: double.infinity,
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  "$noOfIteams ITEMS   ${weight[0]} KG , ${weight[1]} PIECE"
-                      .text
-                      .textStyle(Theme.of(context)
-                          .textTheme
-                          .bodyText2
-                          .copyWith(fontSize: 10, color: Color(0xff979797)))
-                      .make(),
-                  "\₹$totalAmount"
-                      .text
-                      .textStyle(Theme.of(context)
-                          .textTheme
-                          .bodyText2
-                          .copyWith(fontWeight: FontWeight.bold, fontSize: 16))
-                      .make()
+                  Column(
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    children: [
+                      "$noOfIteams ITEMS   ${weight[0]} KG , ${weight[1]} PIECE"
+                          .text
+                          .textStyle(Theme.of(context)
+                              .textTheme
+                              .bodyText2
+                              .copyWith(fontSize: 10, color: Color(0xff979797)))
+                          .make(),
+                      "\₹$totalAmount"
+                          .text
+                          .textStyle(Theme.of(context)
+                              .textTheme
+                              .bodyText2
+                              .copyWith(
+                                  fontWeight: FontWeight.bold, fontSize: 16))
+                          .make()
+                    ],
+                  ),
+                  Flexible(
+                    fit: FlexFit.loose,
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 10),
+                      child: RaisedButton(
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.all(Radius.circular(4))),
+                        color: Color(0xff2BC48A),
+                        onPressed: () => callBack(context),
+                        child: SizedBox(
+                          width: 150,
+                          child: "Add To Bag"
+                              .text
+                              .textStyle(Theme.of(context)
+                                  .textTheme
+                                  .bodyText2
+                                  .copyWith(
+                                      fontSize: 14,
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.w500))
+                              .make()
+                              .centered(),
+                        ),
+                      ),
+                    ),
+                  )
                 ],
               ),
-              Padding(
-                padding: const EdgeInsets.all(10.0),
-                child: RaisedButton(
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.all(Radius.circular(4))),
-                  color: Color(0xff2BC48A),
-                  onPressed: () => callBack(context),
-                  child: SizedBox(
-                    width: 150,
-                    child: "Add To Bag"
-                        .text
-                        .textStyle(Theme.of(context)
-                            .textTheme
-                            .bodyText2
-                            .copyWith(
-                                fontSize: 14,
-                                color: Colors.white,
-                                fontWeight: FontWeight.w500))
-                        .make()
-                        .centered(),
-                  ),
-                ),
-              )
-            ],
+            ),
           ),
         ),
       ),
@@ -215,32 +270,35 @@ class _ShowProductsState extends State<ShowProducts>
 
   Widget showProduct(Product product) {
     var update =
-        context.select<BlocForAddToBag, Function>((value) => value.addToBag);
+        context.select<BlocForAddToBag, void Function(Cart, BuildContext)>(
+            (value) => value.addToBag);
     Cart cart = Cart();
     cart.product = product;
     cart.salles = product.salles[0];
     TextEditingController _controller = TextEditingController();
-    _controller.text = context.select<BlocForAddToBag, String>(
-        (value) => value.getCountIfExist(cart).toString());
+    var updateFunction = context
+        .select<BlocForAddToBag, Function>((value) => value.getCountIfExist);
+    _controller.text = updateFunction(cart).toString();
     _controller.addListener(() {
-      if (mounted) {
-        if (_controller.text.isNotEmpty) {
-          try {
-            var temp = double.parse(_controller.text);
-            if (temp < 0) {
-              errorAlert(context, "Must be Grater thean zero");
-              _controller.text = "0";
-            } else if (temp > product.salles[0].count) {
-              errorAlert(context, "Must be less than Available");
-              _controller.text = "${product.salles[0].count}";
-            }
-          } catch (e) {
-            errorAlert(context, "Must be Number");
+      if (_controller.text.isNotEmpty) {
+        try {
+          var temp = double.parse(_controller.text);
+          if (temp < 0) {
+            showSnackBarOnPage("Must be Grater thean zero");
             _controller.text = "0";
-          } finally {
-            cart.count = double.parse(_controller.text);
-            update(cart);
+          } else if (temp > product.salles[0].count) {
+            showSnackBarOnPage("Maximum Product Selected");
+            _controller.text = "${product.salles[0].count}";
           }
+        } catch (e) {
+          showSnackBarOnPage("Must be Number");
+          _controller.text = "0";
+        } finally {
+          cart.count = double.parse(_controller.text);
+          if (mounted) {
+            update(cart, context);
+          }
+          // _controller.text = updateFunction(cart).toString();
         }
       }
     });
@@ -280,7 +338,7 @@ class _ShowProductsState extends State<ShowProducts>
             Flexible(
                 flex: 1,
                 child: Text(
-                  "${product.salles[0]?.count} ${product.inKg ? 'Kg' : 'Pieces'}   \₹ ${product.amount}",
+                  "\₹ ${product.amount}",
                   style: Theme.of(context)
                       .textTheme
                       .bodyText2
@@ -377,53 +435,68 @@ class _ShowProductsState extends State<ShowProducts>
                 )),
             Flexible(
                 flex: 1,
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceAround,
-                  children: [
-                    Flexible(
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Icon(
-                            Icons.add_shopping_cart,
-                            size: 10,
+                child: Container(
+                  decoration: BoxDecoration(
+                      border: Border(
+                          top: BorderSide(
+                              color: Color(0xffE3E3E3), width: 0.3))),
+                  child: SizedBox(
+                    height: 30,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                      children: [
+                        Flexible(
+                          child: Container(
+                            decoration: BoxDecoration(
+                                border: Border(
+                                    right: BorderSide(
+                                        color: Color(0xffE3E3E3), width: 0.3))),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(
+                                  Icons.add_shopping_cart,
+                                  size: 10,
+                                ),
+                                2.widthBox,
+                                Text(
+                                  "Add to bag",
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .bodyText2
+                                      .copyWith(
+                                          fontWeight: FontWeight.w500,
+                                          fontSize: 12,
+                                          color: Color(0xff979797)),
+                                )
+                              ],
+                            ),
                           ),
-                          10.widthBox,
-                          Text(
-                            "Add to bag",
-                            style: Theme.of(context)
-                                .textTheme
-                                .bodyText2
-                                .copyWith(
-                                    fontWeight: FontWeight.w500,
-                                    fontSize: 12,
-                                    color: Color(0xff979797)),
-                          )
-                        ],
-                      ),
-                    ),
-                    Flexible(
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Icon(
-                            Icons.check_circle_outline,
-                            size: 10,
-                            color: Color(0xff2BC48A),
+                        ),
+                        Flexible(
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(
+                                Icons.check_circle_outline,
+                                size: 10,
+                                color: Color(0xff2BC48A),
+                              ),
+                              2.widthBox,
+                              Text("Buy Now",
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .bodyText2
+                                      .copyWith(
+                                          fontWeight: FontWeight.w500,
+                                          fontSize: 12,
+                                          color: Color(0xff2BC48A)))
+                            ],
                           ),
-                          10.widthBox,
-                          Text("Buy Now",
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .bodyText2
-                                  .copyWith(
-                                      fontWeight: FontWeight.w500,
-                                      fontSize: 12,
-                                      color: Color(0xff2BC48A)))
-                        ],
-                      ),
+                        ),
+                      ],
                     ),
-                  ],
+                  ),
                 ))
           ],
         ),

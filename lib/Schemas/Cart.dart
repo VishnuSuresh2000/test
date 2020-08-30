@@ -83,10 +83,16 @@ class Cart {
   BeruUser customer;
 
   String get id => this._id;
+  set id(id) => this._id = id;
 
   Cart();
   Map<String, dynamic> toMapCreate() {
-    return {'product_id': product.id, 'salles_id': salles.id, 'count': count};
+    return {
+      'product_id': product.id,
+      'salles_id': salles.id,
+      'count': count,
+      if (_id != null) '_id': _id,
+    };
   }
 
   Cart.fromMap(Map<String, dynamic> data) {
