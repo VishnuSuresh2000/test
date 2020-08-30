@@ -6,11 +6,14 @@ class BeruErrorPage extends StatelessWidget {
   const BeruErrorPage({Key key, this.errMsg}) : super(key: key);
   @override
   Widget build(BuildContext context) {
-    return  Center(
-      child: Container(
-          color: Colors.white,
-          child: "Error : $errMsg".text.red700.bold.make(),
+    return  SizedBox(
+      height: context.screenHeight-350,
+      child: Center(
+        child: Container(
+            color: Colors.white,
+            child: "Error : $errMsg".text.red700.bold.make(),
    
+        ),
       ),
     );
   }

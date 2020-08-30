@@ -1,6 +1,7 @@
 import 'package:beru/BLOC/CustomProviders/BLOCForCategory.dart';
 import 'package:beru/BLOC/CustomProviders/BLOCForHome.dart';
 import 'package:beru/BLOC/CustomProviders/userProvider.dart';
+import 'package:beru/BLOC/CustomeStream/CartStream.dart';
 import 'package:beru/CustomFunctions/BeruString.dart';
 import 'package:beru/Schemas/BeruCategory.dart';
 import 'package:beru/Server/ServerApi.dart';
@@ -8,6 +9,7 @@ import 'package:beru/UI/CommonFunctions/BeruErrorPage.dart';
 import 'package:beru/UI/CommonFunctions/BeruLodingBar.dart';
 import 'package:beru/UI/Home/BeruBottomNavigator.dart';
 import 'package:beru/UI/Home/BeruSerach.dart';
+import 'package:beru/UI/Home/ShowCartButton.dart';
 import 'package:beru/UI/InterNetConectivity/CheckConnectivity.dart';
 import 'package:beru/UI/Product/ShowProduct.dart';
 import 'package:beru/main.dart';
@@ -62,12 +64,12 @@ class _BeruHomeState extends State<BeruHome> with TickerProviderStateMixin {
         } else {
           return GridView.count(
             padding: EdgeInsets.symmetric(horizontal: 20),
-            crossAxisCount: context.isMobile?2:6,
+            crossAxisCount: context.isMobile ? 2 : 6,
             primary: false,
             shrinkWrap: true,
-            crossAxisSpacing: 10.0,
+            crossAxisSpacing: 10,
             mainAxisSpacing: 15.0,
-            childAspectRatio: 1,
+            childAspectRatio: 1.3,
             children:
                 value.data.list.map((e) => showCategory(e, context)).toList(),
           );
@@ -94,7 +96,8 @@ class _BeruHomeState extends State<BeruHome> with TickerProviderStateMixin {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Flexible(
-                    flex: 2,
+                  fit: FlexFit.tight,
+                    flex: 3,
                     child: e.hasImg
                         ? Image.network(
                             "${ServerApi.url}/category/getImage/${e.id}",
@@ -109,11 +112,12 @@ class _BeruHomeState extends State<BeruHome> with TickerProviderStateMixin {
                 Flexible(
                     flex: 1,
                     child: Text(
-                      "${firstToUpperCaseString(e.name)}",
+                      "${e.name.toUpperCase()}",
                       style: Theme.of(context)
                           .textTheme
                           .bodyText1
-                          .copyWith(fontSize: 10),
+                          .copyWith(fontSize: 10,
+                          letterSpacing: 1),
                     ))
               ],
             ),
@@ -137,51 +141,48 @@ class _BeruHomeState extends State<BeruHome> with TickerProviderStateMixin {
               title: Text(
                 "Beru",
               ),
-              actions: [
-                Padding(
-                  padding: const EdgeInsets.only(right: 10.0),
-                  child: Icon(
-                    Icons.shopping_cart,
-                  ),
-                )
-              ],
+              actions: [ShowCartButton()],
               // expandedHeight: 120,
               flexibleSpace: Align(
                 alignment: Alignment.bottomCenter,
                 child: Padding(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 20,
-                    vertical: 20
-                  ),
-                  child:BeruSearchBar(),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
+                  child: BeruSearchBar(),
                 ),
               ),
             ),
-            SliverToBoxAdapter(
-              child: SizedBox(
-                width: double.infinity,
-                height: 120,
-                child: Carousel(
-                  images: [
-                    NetworkImage(
-                        'https://media.gettyimages.com/photos/colorful-fresh-organic-vegetables-picture-id882314812'),
-                    NetworkImage(
-                        'https://previews.123rf.com/images/puhhha/puhhha1805/puhhha180500313/100520940-healthy-food-fresh-organic-vegetables-on-white-wooden-background-high-resolution.jpg'),
-                    NetworkImage(
-                        'https://previews.123rf.com/images/puhhha/puhhha1805/puhhha180500313/100520940-healthy-food-fresh-organic-vegetables-on-white-wooden-background-high-resolution.jpg'),
-                    NetworkImage(
-                        'https://media.gettyimages.com/photos/colorful-fresh-organic-vegetables-picture-id882314812')
-                  ],
-                  dotSize: 4.0,
-                  dotSpacing: 15.0,
-                  dotColor: Colors.lightGreenAccent,
-                  indicatorBgPadding: 2.0,
-                  dotBgColor: Colors.transparent,
-                  //borderRadius: true,
-                  moveIndicatorFromBottom: 180.0,
-                  noRadiusForIndicator: true,
+            SliverPadding(
+              sliver: SliverToBoxAdapter(
+                child: Card(
+                  child: SizedBox(
+                    width: double.infinity,
+                    height: 120,
+                    child: Carousel(
+                      images: [
+                        NetworkImage(
+                            'https://media.gettyimages.com/photos/colorful-fresh-organic-vegetables-picture-id882314812'),
+                        NetworkImage(
+                            'https://previews.123rf.com/images/puhhha/puhhha1805/puhhha180500313/100520940-healthy-food-fresh-organic-vegetables-on-white-wooden-background-high-resolution.jpg'),
+                        NetworkImage(
+                            'https://previews.123rf.com/images/puhhha/puhhha1805/puhhha180500313/100520940-healthy-food-fresh-organic-vegetables-on-white-wooden-background-high-resolution.jpg'),
+                        NetworkImage(
+                            'https://media.gettyimages.com/photos/colorful-fresh-organic-vegetables-picture-id882314812')
+                      ],
+                      dotSize: 4.0,
+                      dotSpacing: 15.0,
+                      dotColor: Colors.lightGreenAccent,
+                      indicatorBgPadding: 2.0,
+                      dotBgColor: Colors.transparent,
+                      dotPosition: DotPosition.bottomCenter,
+                      showIndicator: true,
+                      moveIndicatorFromBottom: 180.0,
+                      noRadiusForIndicator: true,
+                    ),
+                  ),
                 ),
               ),
+              padding: EdgeInsets.symmetric(horizontal: 5),
             ),
             SliverPadding(
               sliver: SliverToBoxAdapter(

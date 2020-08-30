@@ -155,7 +155,7 @@ class BlocForAddToBag extends ChangeNotifier {
             },
             callBackName: "Back",
             content:
-                "${res['added'] == 0 ? "" : res['added'].toString() + 'Items Added To Bag'} ${res['updated'] == 0 ? "" : res['updated'].toString() + 'Iteams Updated in Bag'}",
+                "${res['added'] == 0 ? "" : res['added'].toString() + ' Items Added To Bag'} ${res['updated'] == 0 ? "" : res['updated'].toString() + ' Iteams Updated in Bag'}",
             context: context);
       } else {
         errors = errors.map((e) {

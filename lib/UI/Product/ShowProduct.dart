@@ -10,6 +10,7 @@ import 'package:beru/Server/ServerApi.dart';
 import 'package:beru/UI/CommonFunctions/BeruErrorPage.dart';
 import 'package:beru/UI/CommonFunctions/BeruLodingBar.dart';
 import 'package:beru/UI/Home/BeruSerach.dart';
+import 'package:beru/UI/Home/ShowCartButton.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:tuple/tuple.dart';
@@ -70,16 +71,8 @@ class _ShowProductsState extends State<ShowProducts>
             slivers: [
               SliverAppBar(
                 pinned: true,
-
                 title: "Beru Community".text.make(),
-                actions: [
-                  Padding(
-                    padding: const EdgeInsets.only(right: 10.0),
-                    child: Icon(
-                      Icons.shopping_cart,
-                    ),
-                  )
-                ],
+                actions: [ShowCartButton()],
                 collapsedHeight: 100,
                 // expandedHeight: 150,
                 flexibleSpace: Align(
