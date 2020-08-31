@@ -92,6 +92,7 @@ class Cart {
       'salles_id': salles.id,
       'count': count,
       if (_id != null) '_id': _id,
+      if (paymentComplete != null) 'paymentComplete': paymentComplete
     };
   }
 

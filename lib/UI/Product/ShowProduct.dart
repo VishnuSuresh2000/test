@@ -11,6 +11,7 @@ import 'package:beru/UI/CommonFunctions/BeruErrorPage.dart';
 import 'package:beru/UI/CommonFunctions/BeruLodingBar.dart';
 import 'package:beru/UI/Home/BeruSerach.dart';
 import 'package:beru/UI/Home/ShowCartButton.dart';
+import 'package:beru/UI/Product/Counter.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:tuple/tuple.dart';
@@ -263,7 +264,7 @@ class _ShowProductsState extends State<ShowProducts>
 
   Widget showProduct(Product product) {
     var update =
-        context.select<BlocForAddToBag, void Function(Cart, BuildContext)>(
+        context.select<BlocForAddToBag, void Function(Cart, BuildContext,TextEditingController)>(
             (value) => value.addToBag);
     Cart cart = Cart();
     cart.product = product;
@@ -289,7 +290,7 @@ class _ShowProductsState extends State<ShowProducts>
         } finally {
           cart.count = double.parse(_controller.text);
           if (mounted) {
-            update(cart, context);
+            update(cart, context,_controller);
           }
           // _controller.text = updateFunction(cart).toString();
         }
@@ -339,158 +340,88 @@ class _ShowProductsState extends State<ShowProducts>
                 )),
             Flexible(
                 flex: 1,
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 35),
-                  child: ChangeNotifierProvider(
-                    create: (context) => ValueNotifier<bool>(true),
-                    child: Consumer<ValueNotifier<bool>>(
-                      builder: (context, value, child) {
-                        return Card(
+                child: Counter(
+                  controller: _controller,
+                  product: product,
+                )),
+            Flexible(
+                flex: 1,
+                child: Selector<BlocForAddToBag,
+                        void Function(Cart, bool, BuildContext)>(
+                    builder: (context, value, child) {
+                      return Container(
+                        decoration: BoxDecoration(
+                            border: Border(
+                                top: BorderSide(
+                                    color: Color(0xffE3E3E3), width: 0.3))),
+                        child: SizedBox(
+                          height: 30,
                           child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            crossAxisAlignment: CrossAxisAlignment.center,
+                            mainAxisAlignment: MainAxisAlignment.spaceAround,
                             children: [
                               Flexible(
-                                  child: IconButton(
-                                      icon: Icon(
-                                        Icons.remove,
-                                        size: 13,
-                                      ),
-                                      onPressed: () {
-                                        double comput =
-                                            double.parse(_controller.text) -
-                                                (product.inKg ? 0.25 : 1);
-                                        if (comput >= 0) {
-                                          _controller.text = "$comput";
-                                        }
-                                      })),
-                              Flexible(
-                                flex: 2,
-                                child: Container(
-                                  color: Color(0xff68D8AE),
-                                  child: Padding(
-                                    padding: const EdgeInsets.only(top: 8),
-                                    child: TextField(
-                                      style: Theme.of(context)
-                                          .textTheme
-                                          .bodyText2
-                                          .copyWith(
-                                              fontSize: 15,
-                                              color: Colors.white,
-                                              fontWeight: FontWeight.w500),
-                                      textAlign: TextAlign.center,
-                                      decoration: InputDecoration(
-                                        counterText: "",
-                                        counter: Offstage(),
-                                        isCollapsed: true,
-                                        prefix: Offstage(),
-                                        border: InputBorder.none,
-                                      ),
-                                      controller: _controller,
-                                      readOnly: value.value,
-                                      keyboardType: TextInputType.number,
-                                      maxLength: 2,
-                                      onSubmitted: (data) {
-                                        if (_controller.text.isEmpty) {
-                                          _controller.text = "0";
-                                        }
-                                        print("on completed");
-                                        value.value = (!value.value);
-                                      },
-                                      onTap: () {
-                                        print("on completed tap");
-                                        if (value.value) {
-                                          value.value = (!value.value);
-                                          print("value ${value.value}");
-                                        }
-                                      },
+                                child: InkWell(
+                                  onTap: () => value(cart, false, context),
+                                  child: Container(
+                                    decoration: BoxDecoration(
+                                        border: Border(
+                                            right: BorderSide(
+                                                color: Color(0xffE3E3E3),
+                                                width: 0.3))),
+                                    child: Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      children: [
+                                        Icon(
+                                          Icons.add_shopping_cart,
+                                          size: 10,
+                                        ),
+                                        2.widthBox,
+                                        Text(
+                                          "Add to bag",
+                                          style: Theme.of(context)
+                                              .textTheme
+                                              .bodyText2
+                                              .copyWith(
+                                                  fontWeight: FontWeight.w500,
+                                                  fontSize: 12,
+                                                  color: Color(0xff979797)),
+                                        )
+                                      ],
                                     ),
                                   ),
                                 ),
                               ),
                               Flexible(
-                                  child: IconButton(
-                                      icon: Icon(Icons.add, size: 13),
-                                      onPressed: () {
-                                        double comput =
-                                            double.parse(_controller.text) +
-                                                (product.inKg ? 0.25 : 1);
-                                        if (comput <= product.salles[0].count) {
-                                          _controller.text = "$comput";
-                                        }
-                                      }))
-                            ],
-                          ),
-                        );
-                      },
-                    ),
-                  ),
-                )),
-            Flexible(
-                flex: 1,
-                child: Container(
-                  decoration: BoxDecoration(
-                      border: Border(
-                          top: BorderSide(
-                              color: Color(0xffE3E3E3), width: 0.3))),
-                  child: SizedBox(
-                    height: 30,
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceAround,
-                      children: [
-                        Flexible(
-                          child: Container(
-                            decoration: BoxDecoration(
-                                border: Border(
-                                    right: BorderSide(
-                                        color: Color(0xffE3E3E3), width: 0.3))),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Icon(
-                                  Icons.add_shopping_cart,
-                                  size: 10,
+                                child: InkWell(
+                                  onTap: () => value(cart, true, context),
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Icon(
+                                        Icons.check_circle_outline,
+                                        size: 10,
+                                        color: Color(0xff2BC48A),
+                                      ),
+                                      2.widthBox,
+                                      Text("Buy Now",
+                                          style: Theme.of(context)
+                                              .textTheme
+                                              .bodyText2
+                                              .copyWith(
+                                                  fontWeight: FontWeight.w500,
+                                                  fontSize: 12,
+                                                  color: Color(0xff2BC48A)))
+                                    ],
+                                  ),
                                 ),
-                                2.widthBox,
-                                Text(
-                                  "Add to bag",
-                                  style: Theme.of(context)
-                                      .textTheme
-                                      .bodyText2
-                                      .copyWith(
-                                          fontWeight: FontWeight.w500,
-                                          fontSize: 12,
-                                          color: Color(0xff979797)),
-                                )
-                              ],
-                            ),
-                          ),
-                        ),
-                        Flexible(
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Icon(
-                                Icons.check_circle_outline,
-                                size: 10,
-                                color: Color(0xff2BC48A),
                               ),
-                              2.widthBox,
-                              Text("Buy Now",
-                                  style: Theme.of(context)
-                                      .textTheme
-                                      .bodyText2
-                                      .copyWith(
-                                          fontWeight: FontWeight.w500,
-                                          fontSize: 12,
-                                          color: Color(0xff2BC48A)))
                             ],
                           ),
                         ),
-                      ],
-                    ),
-                  ),
-                ))
+                      );
+                    },
+                    selector: (_, handler) => handler.singleIteamToBag))
           ],
         ),
       ),

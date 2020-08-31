@@ -13,7 +13,7 @@ import 'package:flutter/foundation.dart';
 
 class ServerApi {
   static bool offlineOnline = false;
-  static String switchWeb = kIsWeb ? "localhost:80" : "192.168.43.144:80";
+  static String switchWeb = kIsWeb ? "localhost:80" : "192.168.43.220:80";
   static String dns =
       offlineOnline ? "$switchWeb" : "beru-server.herokuapp.com";
   static String url = offlineOnline ? "http://$dns" : "https://$dns";
@@ -38,10 +38,10 @@ class ServerApi {
           options: Options(headers: {"authorization": head}));
       return res.data['data'];
     } on NoUserException catch (e) {
-      print(e.errMsg().toString() + "custom error");
+      print(e.errMsg().toString() + " custom error");
       throw e;
     } on DioError catch (e) {
-      print(e.response.data.toString() + "dio error");
+      print(e.response.data.toString() + " dio error");
       if (e.response.data['data'] == BeruServerErrorStrings.userMustSignUp) {
         throw SighUpNotComplete();
       } else {
@@ -219,6 +219,23 @@ class ServerApi {
       throw BeruServerError();
     } catch (e) {
       print("Error from serverGetCart : $e");
+      throw e;
+    }
+  }
+  static Future<String> addSingleIteamToBag(Cart data) async {
+    try {
+      Response res = await _client.post('/customer/cart/add',
+          options: Options(
+              headers: {"authorization": "Bearer ${await tokenForServer()}"}),
+          data: json.encode(data.toMapCreate()));
+      return res.data['data'];
+    } on DioError catch (e) {
+      print(e.response.data['data'].toString() + "dio error");
+      throw BeruUnKnownError(error: e.response.data['data'].toString());
+    } on TimeoutException {
+      throw BeruServerError();
+    } catch (e) {
+      print(e);
       throw e;
     }
   }

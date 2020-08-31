@@ -15,9 +15,10 @@ class BlocForAddToBag extends ChangeNotifier {
 
   updateCart(CartData data) => _cartData = data;
 
-  void addToBag(Cart cart, BuildContext context) {
+  void addToBag(
+      Cart cart, BuildContext context, TextEditingController controller) {
     if (_addToBag.isEmpty && cart.count != 0) {
-      checkIsExistInCart(cart, context);
+      checkIsExistInCart(cart, context,controller);
       // print("add to bag from BlocForAddToBag in empty");
     } else if (_addToBag.isNotEmpty) {
       int index = _addToBag.indexWhere(
@@ -27,7 +28,7 @@ class BlocForAddToBag extends ChangeNotifier {
       );
       if (index == -1) {
         if (cart.count != 0) {
-          checkIsExistInCart(cart, context);
+          checkIsExistInCart(cart, context, controller);
           // print("add to bag from BlocForAddToBag where not exist");
         }
       } else {
@@ -45,7 +46,8 @@ class BlocForAddToBag extends ChangeNotifier {
     notifyListeners();
   }
 
-  void checkIsExistInCart(Cart cart, BuildContext context) async {
+  void checkIsExistInCart(
+      Cart cart, BuildContext context, TextEditingController controller) async {
     if ((_cartData != null && _cartData?.data != null) ||
         (_cartData != null &&
             _cartData.hasError &&
@@ -69,6 +71,7 @@ class BlocForAddToBag extends ChangeNotifier {
               children: [
                 RaisedButton(
                   onPressed: () {
+                    controller.text = "0";
                     context.pop();
                     notifyListeners();
                   },
@@ -220,9 +223,47 @@ class BlocForAddToBag extends ChangeNotifier {
       }
     } catch (e) {
       context.pop();
-      print("Data in _addToBag ${e.toString()}");
+      print(" Error form addToBagInServer ${e.toString()}");
       errorAlert(context, e.toString());
     }
     // var temp = _addToBag.map((e) => e.toMapCreate()).toString();
+  }
+
+  void singleIteamToBag(Cart cart, bool withPay, BuildContext context) async {
+    var res = "";
+    try {
+      showDialog(context: context, child: beruLoadingBar());
+      int index = _addToBag.indexWhere((element) =>
+          (element.product.id == cart.product.id) &&
+          (element.salles.id == cart.salles.id));
+
+      if (index == -1) {
+        res = "Count Not To Be Zero";
+      } else {
+        if (withPay) {
+          _addToBag[index].paymentComplete = true;
+        }
+        // print("Data to send server ${_addToBag[index].toString()}");
+        res = await ServerApi.addSingleIteamToBag(_addToBag[index]);
+        res = res.toString() +
+            "${withPay ? " Check In Orders" : " Check In Bag"}";
+      }
+      context.pop();
+      alertWithCallBack(
+          cakllback: () {
+            if (res != "Count Not To Be Zero") {
+              _addToBag.removeAt(index);
+            }
+            notifyListeners();
+            context.pop();
+          },
+          callBackName: "back",
+          content: res,
+          context: context);
+    } catch (e) {
+      context.pop();
+      print("Error from in singleIteamToBag ${e.toString()}");
+      errorAlert(context, e.toString());
+    }
   }
 }
