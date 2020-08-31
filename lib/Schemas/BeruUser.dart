@@ -3,15 +3,12 @@ import 'package:beru/Schemas/address.dart';
 
 class BeruUser {
   String firstName;
-
- 
   String lastName;
   int phoneNumber;
   String email;
   Address address;
   String _id;
   bool sex;
-
   String get fullName {
     return "${firstToUpperCaseString(firstName)} ${firstToUpperCaseString(lastName ?? "")}";
   }
@@ -26,6 +23,7 @@ class BeruUser {
 
   BeruUser();
   BeruUser.fromMap(Map<String, dynamic> data) {
+    this._id = data['_id'] ?? null;
     this.firstName = data['firstName'] ?? null;
     this.lastName = data['lastName'] ?? null;
     this.phoneNumber = data['phoneNumber'] ?? null;

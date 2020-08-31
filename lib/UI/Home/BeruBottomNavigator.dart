@@ -1,27 +1,15 @@
 import 'package:beru/BLOC/CustomProviders/BLOCForHome.dart';
+import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:tuple/tuple.dart';
-import 'package:velocity_x/velocity_x.dart';
-import 'package:flutter/material.dart';
 
 class BeruBottomNavigator extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BottomAppBar(
-      shape: CircularNotchedRectangle(),
-      notchMargin: 6.0,
-      color: Colors.transparent,
+      color: Colors.white,
       elevation: 9.0,
       clipBehavior: Clip.antiAlias,
-      child: Container(
-        height: 50,
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.only(
-            topLeft: Radius.circular(25),
-            topRight: Radius.circular(25),
-          ),
-          color: Colors.white,
-        ),
         child: Selector<BloCForHome, Tuple2<BodyNav, Function>>(
           shouldRebuild: (previous, next) =>
               previous.item1.toString() != next.toString(),
@@ -45,7 +33,7 @@ class BeruBottomNavigator extends StatelessWidget {
                 ),
                 onPressed: () => value.item2(BodyNav.second),
               ),
-              50.widthBox,
+              // 50.widthBox,
               IconButton(
                   icon: Icon(
                     Icons.search,
@@ -67,7 +55,7 @@ class BeruBottomNavigator extends StatelessWidget {
           ),
           selector: (_, handler) => Tuple2(handler.select, handler.setBodynav),
         ),
-      ),
+   
     );
   }
 }

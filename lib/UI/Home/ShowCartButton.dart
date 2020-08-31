@@ -33,32 +33,28 @@ class ShowCartButton extends StatelessWidget {
                         padding: const EdgeInsets.only(top: 10),
                         child: Container(
                           decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                              color: Colors.red),
+                              shape: BoxShape.circle, color: Colors.red),
                           child: SizedBox(
                             height: 16,
                             width: 16,
-                            child:
-                                "$value"
-                                    .text
-                                    .textStyle(Theme.of(context)
-                                        .textTheme
-                                        .caption
-                                        .copyWith(
-                                            color: Colors.white,
-                                            fontSize: 14,
-                                            fontWeight:
-                                                FontWeight.bold))
-                                    .make()
-                                    .centered(),
+                            child: "$value"
+                                .text
+                                .textStyle(Theme.of(context)
+                                    .textTheme
+                                    .caption
+                                    .copyWith(
+                                        color: Colors.white,
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.bold))
+                                .make()
+                                .centered(),
                           ),
                         ),
                       ),
                     );
                   }
                 },
-                selector: (_, handler) =>
-                    handler?.data?.length ?? 0),
+                selector: (_, handler) => handler?.data?.length ?? 0),
           ],
         ),
       ),

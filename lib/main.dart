@@ -57,7 +57,7 @@ class _MyAppState extends State<MyApp> {
   @override
   void initState() {
     initializeFlutterFire();
-    ServerApi.offlineOnline = true;
+    ServerApi.offlineOnline = false;
     ServerSocket.serverSocket();
     super.initState();
   }

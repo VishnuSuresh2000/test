@@ -13,7 +13,7 @@ import 'package:flutter/foundation.dart';
 
 class ServerApi {
   static bool offlineOnline = false;
-  static String switchWeb = kIsWeb ? "localhost:80" : "192.168.43.220:80";
+  static String switchWeb = kIsWeb ? "localhost:80" : "192.168.43.144:80";
   static String dns =
       offlineOnline ? "$switchWeb" : "beru-server.herokuapp.com";
   static String url = offlineOnline ? "http://$dns" : "https://$dns";
@@ -102,11 +102,11 @@ class ServerApi {
       Response res = await _client.get('/customer/salles/data',
           options: Options(
               headers: {"authorization": "Bearer ${await tokenForServer()}"}));
-      print("the data from ${res?.data}");
-      if (res?.data['data'] == null) {
-        print("no data get");
-        return await serverGetSallesProduct();
-      }
+      // print("the data from ${res?.data}");
+      // if (res?.data['data'] == null) {
+      //   print("no data get");
+      //   return await serverGetSallesProduct();
+      // }
       List data = res.data['data'];
       return data.map((e) => Product.fromMap(e)).toList();
     } on DioError catch (e) {
@@ -222,6 +222,7 @@ class ServerApi {
       throw e;
     }
   }
+
   static Future<String> addSingleIteamToBag(Cart data) async {
     try {
       Response res = await _client.post('/customer/cart/add',
@@ -229,6 +230,25 @@ class ServerApi {
               headers: {"authorization": "Bearer ${await tokenForServer()}"}),
           data: json.encode(data.toMapCreate()));
       return res.data['data'];
+    } on DioError catch (e) {
+      print(e.response.data['data'].toString() + "dio error");
+      throw BeruUnKnownError(error: e.response.data['data'].toString());
+    } on TimeoutException {
+      throw BeruServerError();
+    } catch (e) {
+      print(e);
+      throw e;
+    }
+  }
+
+  static Future<BeruUser> getUserData() async {
+    try {
+      Response res = await _client.get(
+        '/customer/userData',
+        options: Options(
+            headers: {"authorization": "Bearer ${await tokenForServer()}"}),
+      );
+      return BeruUser.fromMap(res.data['data']);
     } on DioError catch (e) {
       print(e.response.data['data'].toString() + "dio error");
       throw BeruUnKnownError(error: e.response.data['data'].toString());

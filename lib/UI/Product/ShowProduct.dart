@@ -94,6 +94,17 @@ class _ShowProductsState extends State<ShowProducts>
                             ))
                         .toList()),
               ),
+              SliverToBoxAdapter(
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 20
+                  ),
+                  child: Divider(
+                    color: Color(0xff707070),
+                    thickness: 0.3,
+                  ),
+                ),
+              ),
               if (products?.hasError == null && products?.data == null)
                 SliverToBoxAdapter(
                   child: beruLoadingBar(),
@@ -263,9 +274,10 @@ class _ShowProductsState extends State<ShowProducts>
   }
 
   Widget showProduct(Product product) {
-    var update =
-        context.select<BlocForAddToBag, void Function(Cart, BuildContext,TextEditingController)>(
-            (value) => value.addToBag);
+    var update = context.select<
+        BlocForAddToBag,
+        void Function(Cart, BuildContext,
+            TextEditingController)>((value) => value.addToBag);
     Cart cart = Cart();
     cart.product = product;
     cart.salles = product.salles[0];
@@ -290,7 +302,7 @@ class _ShowProductsState extends State<ShowProducts>
         } finally {
           cart.count = double.parse(_controller.text);
           if (mounted) {
-            update(cart, context,_controller);
+            update(cart, context, _controller);
           }
           // _controller.text = updateFunction(cart).toString();
         }

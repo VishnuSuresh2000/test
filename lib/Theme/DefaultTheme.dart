@@ -4,6 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 ThemeData defaultTheme = ThemeData(
     primaryColor: Colors.white,
     backgroundColor: Colors.white,
+    accentColor: Color(0xff2BC48A),
     colorScheme: ColorScheme.fromSwatch(
       backgroundColor: Colors.white,
     ),
@@ -58,7 +59,8 @@ ThemeData defaultTheme = ThemeData(
             fontWeight: FontWeight.bold,
           ),
         ),
-        iconTheme: IconThemeData(color: Color(0xff5B5B5B))),
+        iconTheme: IconThemeData(color: Color(0xff5B5B5B)),
+        actionsIconTheme: IconThemeData(color: Color(0xff5B5B5B))),
     tabBarTheme: TabBarTheme(
         labelColor: Color(0xff2BC48A),
         labelStyle: TextStyle(

@@ -12,7 +12,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 class UserState extends ChangeNotifier {
-  final BeruUser _user = BeruUser();
+  BeruUser _user = BeruUser();
   final BeruRegister register = BeruRegister();
   StreamSubscription<bool> serverSignUpSbub;
   StreamSubscription<User> firebaseSignUpSbub;
@@ -22,10 +22,24 @@ class UserState extends ChangeNotifier {
   bool userStatus; //true siginin, false sigin out
   bool serverError = false;
   bool hasAddress;
+  bool hasErrorUserDetails;
   Exception error;
 
   UserState() : super() {
     autoUserStatusCheck();
+  }
+
+  void loadUserDetails() async {
+    try {
+      _user = await ServerApi.getUserData();
+      hasErrorUserDetails = false;
+    } catch (e) {
+      hasErrorUserDetails = true;
+      error = e;
+      print("Error from loading userData $e");
+    } finally {
+      notifyListeners();
+    }
   }
 
   void autoUserStatusCheck() {
@@ -101,6 +115,12 @@ class UserState extends ChangeNotifier {
   }
 
   BeruUser get user {
+    if (userSignUp) {
+      if (_user.id == null) {
+        print("user data load when that is not get");
+        loadUserDetails();
+      }
+    }
     return _user;
   }
 

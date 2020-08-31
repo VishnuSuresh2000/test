@@ -2,6 +2,7 @@ import 'package:beru/UI/Home/BeruHome.dart';
 import 'package:beru/UI/InterNetConectivity/NoInterNet.dart';
 import 'package:beru/UI/Login/checkUserStatus.dart';
 import 'package:beru/UI/Product/ShowProduct.dart';
+import 'package:beru/UI/Profile/BeruProfileView.dart';
 import 'package:flutter/material.dart';
 import 'package:page_transition/page_transition.dart';
 
@@ -18,6 +19,9 @@ transitionOnRoute(RouteSettings settings) {
       break;
     case ShowProducts.route:
       return defalutTransition(ShowProducts(), settings);
+      break;
+    case BeruProfile.route:
+      return defalutTransition(BeruProfile(), settings);
       break;
   }
 }

@@ -10,12 +10,12 @@ class Address {
   Address();
 
   Address.fromMap(Map<String, dynamic> data) {
-    this.houseName = data['houseName'];
-    this.locality = data['locality'];
-    this.pinCode = data['pinCode'];
-    this.city = data['city'];
-    this.district = data['district'];
-    this.state = data['state'];
+    this.houseName = data['houseName'] ?? null;
+    this.locality = data['locality'] ?? null;
+    this.pinCode = data['pinCode'] ?? null;
+    this.city = data['city'] ?? null;
+    this.district = data['district'] ?? null;
+    this.state = data['state'] ?? null;
     this.alternateNumber = data['alternateNumber'] ?? null;
   }
   Map<String, dynamic> toMap() {
