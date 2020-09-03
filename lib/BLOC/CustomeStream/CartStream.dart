@@ -3,6 +3,7 @@ import 'package:beru/CustomException/BeruException.dart';
 import 'package:beru/Schemas/Cart.dart';
 import 'package:beru/Server/ServerApi.dart';
 import 'package:beru/Server/ServerWebSocket.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class CartData {
   List<Cart> data;
@@ -25,16 +26,22 @@ class CartStream {
   void getDataFromServer() async {
     print("called get Data from server");
     try {
-      var dataRes = await ServerApi.serverGetCart();
-      print("got Data from Cart Data from server $dataRes");
-      if (_controller.hasListener) {
-        _controller.sink
-            .add(CartData(hasError: false, data: dataRes, error: null));
+      if (FirebaseAuth.instance.currentUser != null) {
+        print("User Dectedt for load cart");
+        var dataRes = await ServerApi.serverGetCart();
+        print("got Data from Cart Data from server $dataRes");
+        if (_controller.hasListener) {
+          _controller.sink
+              .add(CartData(hasError: false, data: dataRes, error: null));
+        }
+      } else {
+        print("no User Dectedt for load cart");
+        getDataFromServer();
       }
     } on BeruNoProductForSalles catch (e) {
-      print("Error from Cart stream ${e.toString()}");
+      print("Error from No Product error Cart stream ${e.toString()}");
       if (_controller.hasListener) {
-        _controller.sink..add(CartData(hasError: true, data: null, error: e));
+        _controller.sink.add(CartData(hasError: true, data: null, error: e));
       }
     } catch (e) {
       print("Error from Cart stream ${e.toString()}");

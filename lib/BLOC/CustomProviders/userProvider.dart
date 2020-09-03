@@ -1,9 +1,8 @@
-import 'dart:async';
 import 'package:beru/Auth/AuthServies.dart';
-import 'package:beru/BLOC/CustomeStream/StreamToCheckRegister.dart';
+import 'package:beru/BLOC/CustomProviders/BlocForFirbase.dart';
 import 'package:beru/CustomException/BeruException.dart';
-import 'package:beru/Schemas/address.dart';
 import 'package:beru/Schemas/BeruUser.dart';
+import 'package:beru/Schemas/address.dart';
 import 'package:beru/Server/ServerApi.dart';
 import 'package:beru/UI/CommonFunctions/BeruAlertWithCallBack.dart';
 import 'package:beru/UI/CommonFunctions/BeruLodingBar.dart';
@@ -13,21 +12,69 @@ import 'package:flutter/material.dart';
 
 class UserState extends ChangeNotifier {
   BeruUser _user = BeruUser();
-  final BeruRegister register = BeruRegister();
-  StreamSubscription<bool> serverSignUpSbub;
-  StreamSubscription<User> firebaseSignUpSbub;
 
+  FirebaseData _firebaseData = FirebaseData();
   bool userFirbase;
   bool userSignUp;
-  bool userStatus; //true siginin, false sigin out
-  bool serverError = false;
+//true siginin, false sigin out
+  bool serverError=false;
   bool hasAddress;
   bool hasErrorUserDetails;
+  bool state = false;
+  // bool loading = false;
   Exception error;
 
-  UserState() : super() {
-    autoUserStatusCheck();
+  update(FirebaseData data) {
+    if (_firebaseData.state.toString() != data.state.toString()) {
+      // print("Data State Changed ${_firebaseData.state} ${data.state}");
+      _firebaseData = data;
+      initUserState();
+    }
   }
+
+  initUserState() async {
+    if (_firebaseData.user == null) {
+      userFirbase = false;
+      userSignUp = false;
+      hasAddress = false;
+      state = !state;
+      notifyListeners();
+    } else if (_firebaseData.user != null) {
+      userFirbase = true;
+      initServerCheck();
+    }
+  }
+
+  initServerCheck() async {
+    try {
+      var res = await ServerApi.serverCheckIfExist();
+      userSignUp = res['user'] ?? false;
+      hasAddress = res['address'] ?? false;
+      serverError = false;
+    } on SighUpNotComplete {
+      print("Not completed the registration");
+      userSignUp = false;
+      hasAddress = false;
+      serverError = false;
+    } catch (e) {
+      print("error from initServerCheck server UserState $e");
+      serverError = true;
+      error = e is Exception ?e :BeruUnKnownError(error: e.toString());
+    } finally {
+      if (userSignUp != null && !userSignUp) {
+        setTempData();
+      } else {
+        state = !state;
+        notifyListeners();
+      }
+      if (serverError) {
+        print("error from initServerCheck server UserState and recalling");
+        initServerCheck();
+      }
+    }
+  }
+
+  UserState() : super();
 
   void loadUserDetails() async {
     try {
@@ -40,78 +87,6 @@ class UserState extends ChangeNotifier {
     } finally {
       notifyListeners();
     }
-  }
-
-  void autoUserStatusCheck() {
-    firebaseSignUpSbub =
-        FirebaseAuth.instance.authStateChanges().listen((event) async {
-      // print("From Firbase Stream init $event");
-      if (event != null) {
-        print("Data  ${event.displayName ?? null}");
-        userFirbase = true;
-        if (serverSignUpSbub == null) {
-          print("init the server check stream");
-          checkUserInServer();
-        } else {
-          if (serverSignUpSbub.isPaused) {
-            print("And is paused / Resume the server check stream");
-            serverSignUpSbub.resume();
-          }
-          // checkUserInServer();
-        }
-        if (!firebaseSignUpSbub.isPaused) {
-          firebaseSignUpSbub.pause();
-        }
-      } else {
-        userFirbase = false;
-        if (!firebaseSignUpSbub.isPaused) {
-          firebaseSignUpSbub.pause();
-        }
-      }
-
-      setUserStatus();
-      notifyListeners();
-    }, onError: (error) {
-      print("From Firbase Stream $error");
-      serverError = true;
-      error = BeruFirebaseError();
-      setUserStatus();
-      notifyListeners();
-    });
-  }
-
-  void checkUserInServer() {
-    serverSignUpSbub = register.stream.listen((event) {
-      print("Stream From ServerSignUp $event");
-      userSignUp = event;
-      if (!event) {
-        print("No user registerd Stream From ServerSignUp");
-        setTempData();
-      }
-      if (event) {
-        checkHasAddress();
-      }
-      if (!serverSignUpSbub.isPaused) {
-        serverSignUpSbub.pause();
-      }
-      setUserStatus();
-      notifyListeners();
-    }, onError: (error) {
-      if (error is BeruServerError) {
-        serverError = true;
-        error = BeruServerError();
-      } else {
-        serverError = true;
-        error = error;
-      }
-      setUserStatus();
-      notifyListeners();
-    });
-  }
-
-  void setUserStatus() {
-    userStatus = (userFirbase ?? false) && (userSignUp ?? false);
-    notifyListeners();
   }
 
   BeruUser get user {
@@ -135,43 +110,30 @@ class UserState extends ChangeNotifier {
       _user.firstName = user.displayName.split(' ')[0] ?? null;
       _user.lastName = user.displayName.split(' ')[1] ?? null;
       _user.email = user.email;
-      notifyListeners();
       try {
         _user.phoneNumber =
             user.phoneNumber != null ? int.parse(user.phoneNumber) : null;
       } catch (e) {
         print("Error from setTemp $e");
+      } finally {
+        print("${_user.firstName} ${_user.lastName}");
+        state = !state;
+        notifyListeners();
       }
-      print("${_user.firstName} ${_user.lastName}");
-      notifyListeners();
     }
   }
 
   set siginInFirbase(bool value) {
     userFirbase = value;
-    if (serverSignUpSbub == null) {
-      print("init the server check stream");
-      checkUserInServer();
-    } else {
-      print("resume signinfirebase the server check stream");
-      if (serverSignUpSbub.isPaused) {
-        serverSignUpSbub.resume();
-      }
-    }
-    if (!firebaseSignUpSbub.isPaused) {
-      firebaseSignUpSbub.pause();
-    }
+    initServerCheck();
 
-    notifyListeners();
+    // notifyListeners();
   }
 
   set siginUpServer(bool value) {
-    if (!serverSignUpSbub.isPaused) {
-      serverSignUpSbub.pause();
-    }
     userSignUp = value;
     this.hasAddress = false;
-    setUserStatus();
+    state = !state;
     notifyListeners();
   }
 
@@ -179,13 +141,10 @@ class UserState extends ChangeNotifier {
     print("Sign Out is called");
     AuthServies.signOut().then((value) {
       print("Sign Out is Complted");
-      userStatus = false;
       userFirbase = false;
       userSignUp = null;
       this.hasAddress = null;
-      if (!serverSignUpSbub.isPaused) {
-        serverSignUpSbub.pause();
-      }
+      state = !state;
       notifyListeners();
     });
   }
@@ -246,22 +205,19 @@ class UserState extends ChangeNotifier {
 
   @override
   void dispose() {
-    firebaseSignUpSbub.cancel();
-    serverSignUpSbub.cancel();
-    register.dispose();
     super.dispose();
   }
 
-  void checkHasAddress() async {
-    try {
-      print("called the function CheckHass address");
-      this.hasAddress = await ServerApi.serverCheckhasAddress();
-      notifyListeners();
-    } catch (e) {
-      print("Error from Check has address $e");
-      checkHasAddress();
-    }
-  }
+  // void checkHasAddress() async {
+  //   try {
+  //     print("called the function CheckHass address");
+  //     this.hasAddress = await ServerApi.serverCheckhasAddress();
+  //     notifyListeners();
+  //   } catch (e) {
+  //     print("Error from Check has address $e");
+  //     checkHasAddress();
+  //   }
+  // }
 
   void addAddressToUser(Address address, BuildContext context) async {
     showDialog(
@@ -278,6 +234,7 @@ class UserState extends ChangeNotifier {
           callBackName: "Continue",
           cakllback: () {
             this.hasAddress = true;
+            state = !state;
             notifyListeners();
             Navigator.of(context).pop();
           });

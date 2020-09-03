@@ -13,101 +13,98 @@ class BeruLogin extends StatefulWidget {
 class _BeruLoginState extends State<BeruLogin> {
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Theme.of(context).backgroundColor,
-      body: Container(
-        child: Center(
-          child: FractionallySizedBox(
-            heightFactor: 0.75,
-            child: SizedBox(
-              width: context.isMobile ? context.screenWidth : 380,
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Flexible(
-                    child: Image.asset(
-                      'assets/images/logo/logo.png',
-                      height: 70,
-                    ),
-                    fit: FlexFit.tight,
-                    flex: 2,
+    return Container(
+      child: Center(
+        child: FractionallySizedBox(
+          heightFactor: 0.75,
+          child: SizedBox(
+            width: context.isMobile ? context.screenWidth : 380,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Flexible(
+                  child: Image.asset(
+                    'assets/images/logo/logo.png',
+                    height: 70,
                   ),
-                  Flexible(
-                    child: Text(
-                      "Welcome to Beru",
-                      style: GoogleFonts.openSans(
-                          fontSize: 16.0, fontWeight: FontWeight.bold),
-                    ),
-                    flex: 1,
+                  fit: FlexFit.tight,
+                  flex: 2,
+                ),
+                Flexible(
+                  child: Text(
+                    "Welcome to Beru",
+                    style: GoogleFonts.openSans(
+                        fontSize: 16.0, fontWeight: FontWeight.bold),
                   ),
-                  Flexible(
-                    child: Container(),
-                    flex: 1,
+                  flex: 1,
+                ),
+                Flexible(
+                  child: Container(),
+                  flex: 1,
+                ),
+                Flexible(
+                  child: LoginButton(
+                    text: "facebook",
+                    boderColorShow: false,
+                    background: Color(0xff635FFC),
+                    callBack: () {},
                   ),
-                  Flexible(
-                    child: LoginButton(
-                      text: "facebook",
-                      boderColorShow: false,
-                      background: Color(0xff635FFC),
-                      callBack: () {},
-                    ),
-                    flex: 1,
+                  flex: 1,
+                ),
+                spacingFactor(),
+                Flexible(
+                  child: LoginButton(
+                    text: "google",
+                    boderColorShow: true,
+                    background: Colors.white,
+                    callBack: context
+                        .watch<UserState>()
+                        .siginInFirebase("google", context),
                   ),
-                  spacingFactor(),
-                  Flexible(
-                    child: LoginButton(
-                      text: "google",
-                      boderColorShow: true,
-                      background: Colors.white,
-                      callBack: context
-                          .watch<UserState>()
-                          .siginInFirebase("google", context),
-                    ),
-                    flex: 1,
+                  flex: 1,
+                ),
+                spacingFactor(),
+                Flexible(
+                  child: LoginButton(
+                    text: "beru",
+                    boderColorShow: false,
+                    background: Colors.grey[200],
+                    callBack: () {},
                   ),
-                  spacingFactor(),
-                  Flexible(
-                    child: LoginButton(
-                      text: "beru",
-                      boderColorShow: false,
-                      background: Colors.grey[200],
-                      callBack: () {},
-                    ),
-                    flex: 1,
-                  ),
-                  // spacingFactor(),
-                  // Flexible(
-                  //   child: Text(
-                  //     'Already a member? Log in',
-                  //     style: GoogleFonts.lato(
-                  //       fontWeight: FontWeight.bold,
-                  //       decoration: TextDecoration.underline,
-                  //     ),
-                  //   ),
-                  //   flex: 1,
-                  // ),
+                  flex: 1,
+                ),
+                // spacingFactor(),
+                // Flexible(
+                //   child: Text(
+                //     'Already a member? Log in',
+                //     style: GoogleFonts.lato(
+                //       fontWeight: FontWeight.bold,
+                //       decoration: TextDecoration.underline,
+                //     ),
+                //   ),
+                //   flex: 1,
+                // ),
 
-                  spacingFactor(),
-                  Flexible(
-                    child: SizedBox(
-                      width: 250,
-                      child: StyledText(
-                        textAlign: TextAlign.center,
-                        text:
-                            '<lato>By continuing, you agree to Beru\'s <bold> Terms of Service </bold>  and <bold> privacy policy </bold> </lato>',
-                        styles: {
-                          'lato': GoogleFonts.openSans(
-                            fontSize: 10.0,
-                          ),
-                          'bold': GoogleFonts.openSans(
-                              fontSize: 10.0, fontWeight: FontWeight.bold),
-                        },
-                      ),
+                spacingFactor(),
+                Flexible(
+                  child: SizedBox(
+                    width: 250,
+                    child: StyledText(
+                      textAlign: TextAlign.center,
+                      text:
+                          '<lato>By continuing, you agree to Beru\'s <bold> Terms of Service </bold>  and <bold> privacy policy </bold> </lato>',
+                      styles: {
+                        'lato': GoogleFonts.openSans(
+                          fontSize: 10.0,
+                        ),
+                        'bold': GoogleFonts.openSans(
+                            fontSize: 10.0, fontWeight: FontWeight.bold),
+                      },
                     ),
-                    flex: 1,
-                  )
-                ],
-              ),
+                  ),
+                  flex: 1,
+                )
+              ],
             ),
           ),
         ),

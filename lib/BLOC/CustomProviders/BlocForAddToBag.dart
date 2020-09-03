@@ -18,7 +18,7 @@ class BlocForAddToBag extends ChangeNotifier {
   void addToBag(
       Cart cart, BuildContext context, TextEditingController controller) {
     if (_addToBag.isEmpty && cart.count != 0) {
-      checkIsExistInCart(cart, context,controller);
+      checkIsExistInCart(cart, context, controller);
       // print("add to bag from BlocForAddToBag in empty");
     } else if (_addToBag.isNotEmpty) {
       int index = _addToBag.indexWhere(
@@ -97,6 +97,21 @@ class BlocForAddToBag extends ChangeNotifier {
 
   int getNumberOfiteams() => _addToBag.length;
   bool toBuildAddToBag() => _addToBag.isNotEmpty;
+  bool toBuildCardCod() => _cartData?.data?.isNotEmpty ?? false;
+
+  double totalAmountInPay() {
+    double total = 0;
+    try {
+      for (var i in _cartData.data) {
+        // print("total ${i.totalAmount}");
+        total += i.totalAmount;
+      }
+      return total;
+    } catch (e) {
+      print("Error from totalAmountInPay $e");
+      return total;
+    }
+  }
 
   double totalAmount() {
     try {
@@ -108,6 +123,107 @@ class BlocForAddToBag extends ChangeNotifier {
     } catch (e) {
       // print("error from totalAmount blocAddTobag $e");
       return 0;
+    }
+  }
+
+  List<double> toWeightCart() {
+    try {
+      double totalKg = 0;
+      double totalPieace = 0;
+      if (_cartData?.data != null) {
+        for (var i in _cartData.data) {
+          if (i.product.inKg) {
+            totalKg = totalKg + i.count;
+          } else {
+            totalPieace = totalPieace + i.count;
+          }
+        }
+      }
+      return [totalKg, totalPieace];
+    } catch (e) {
+      // print("error from toWeigh blocAddTobag $e");
+      return [0, 0];
+    }
+  }
+
+  void conformOrdersInCart(BuildContext context) async {
+    showDialog(context: context, child: beruLoadingBar());
+    try {
+      var res = await ServerApi.conformDelivary();
+      print("data from conformOrdersInCart $res");
+      List errors = res['error'] ?? [];
+      print("error from multiCart ${errors.length}");
+      if (errors.length == 0) {
+        context.pop();
+        alertWithCallBack(
+            cakllback: () {
+              notifyListeners();
+              context.pop();
+            },
+            callBackName: "Back",
+            content: "${res['payed']} Items Conformed For Delivary",
+            context: context);
+      } else {
+        errors = errors.map((e) {
+          return {
+            "product": _cartData.data
+                .firstWhere(
+                  (element) {
+                    var temp = Cart.fromMap(e['cart']);
+                    return (element.product.id == temp.product.id) &&
+                        (element.salles.id == temp.salles.id);
+                  },
+                  orElse: () => null,
+                )
+                ?.product
+                ?.name,
+            "error": e['error']
+          };
+        }).toList();
+        context.pop();
+        showDialog(
+          context: context,
+          builder: (context) => AlertDialog(
+            content: SizedBox(
+              height: 200,
+              child: SingleChildScrollView(
+                child: Center(
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 10),
+                    child: Column(
+                      children: [
+                        Text("${res['payed']} Items Conformed For Delivary"),
+                        ...errors
+                            .map((e) => Padding(
+                                  padding:
+                                      const EdgeInsets.symmetric(vertical: 10),
+                                  child:
+                                      Text("${e['error']} on ${e['product']}"),
+                                ))
+                            .toList(),
+                        Row(
+                          children: [
+                            RaisedButton(
+                              onPressed: () {
+                                notifyListeners();
+                                context.pop();
+                              },
+                              child: Text("Back"),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+        );
+      }
+    } catch (e) {
+      print("Error on  conformOrdersInCart $e");
+      errorAlert(context, e.toString());
     }
   }
 

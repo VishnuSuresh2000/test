@@ -1,10 +1,10 @@
 import 'package:beru/BLOC/CustomProviders/BLOCForHome.dart';
-import 'package:beru/UI/Home/BeruBottomNavigator.dart';
+import 'package:beru/UI/CommonFunctions/RouteParmeter.dart';
 import 'package:beru/UI/Home/BeruDrawer.dart';
 import 'package:beru/UI/Home/BeruHomeBody.dart';
 import 'package:beru/UI/Home/BeruSerach.dart';
 import 'package:beru/UI/Home/ShowCartButton.dart';
-import 'package:beru/UI/InterNetConectivity/CheckConnectivity.dart';
+import 'package:beru/UI/Login/checkUserStatus.dart';
 import 'package:beru/main.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
@@ -14,15 +14,18 @@ class BeruHome extends StatelessWidget {
   // final _controller = ScrollController();
   // _con
   static const String route = '/BeruHome';
+
   @override
   Widget build(BuildContext context) {
+    print("called the build home function");
     return WillPopScope(
-        onWillPop: () {
-          print("Wiillpop executed");
-          globalClose();
-          return Future.value(false);
-        },
-        child: checkInterNet(body(context)));
+      onWillPop: () {
+        print("Wiillpop executed");
+        globalClose();
+        return Future.value(false);
+      },
+      child: body(context),
+    );
   }
 
   body(BuildContext context) {
@@ -39,35 +42,31 @@ class BeruHome extends StatelessWidget {
         // ),
         // floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
         // bottomNavigationBar: BeruBottomNavigator(),
-        body: NestedScrollView(
-            scrollDirection: Axis.vertical,
-            headerSliverBuilder: (BuildContext context, bool temp) {
-              return [
-                SliverAppBar(
-                  actionsIconTheme:
-                      Theme.of(context).appBarTheme.actionsIconTheme,
-                  iconTheme: Theme.of(context).appBarTheme.iconTheme,
-                  // leading: Icon(
-                  //   Icons.menu,
-                  // ),
-                  backgroundColor: Colors.white,
-                  centerTitle: true,
-                  pinned: true,
-                  // toolbarHeight: 110,
-                  collapsedHeight: 110,
-                  title: Text(
-                    "Beru",
-                  ),
-                  actions: [ShowCartButton()],
-                  // expandedHeight: 120,
-                  flexibleSpace: searchBar(),
-                ),
-              ];
-            },
-            body: Selector<BloCForHome, BodyNav>(
+        body: CheckUserStatus(
+          child: CustomScrollView(slivers: [
+            SliverAppBar(
+              actionsIconTheme: Theme.of(context).appBarTheme.actionsIconTheme,
+              iconTheme: Theme.of(context).appBarTheme.iconTheme,
+              // leading: Icon(
+              //   Icons.menu,
+              // ),
+              backgroundColor: Colors.white,
+              centerTitle: true,
+              pinned: true,
+              // toolbarHeight: 110,
+              collapsedHeight: 110,
+              title: Text(
+                "Beru",
+              ),
+              actions: [ShowCartButton()],
+              // expandedHeight: 120,
+              flexibleSpace: searchBar(),
+            ),
+            Selector<BloCForHome, BodyNav>(
               shouldRebuild: (previous, next) =>
                   previous.toString() != next.toString(),
               builder: (context, value, child) {
+                print("selctor in home show body home");
                 switch (value) {
                   // case BodyNav.first:
                   //   return BeruHomeBody();
@@ -80,7 +79,9 @@ class BeruHome extends StatelessWidget {
                 }
               },
               selector: (_, handler) => handler.select,
-            )));
+            ),
+          ]),
+        ));
   }
 
   Align searchBar() {

@@ -16,9 +16,7 @@ class _BeruAdddressAddingState extends State<BeruAdddressAdding> {
   Address _userAddress = Address();
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.grey,
-      body: Center(
+    return  Center(
         child: Container(
           height: context.isMobile
               ? context.percentHeight * 100
@@ -157,7 +155,7 @@ class _BeruAdddressAddingState extends State<BeruAdddressAdding> {
                     ),
                   )))),
         ),
-      ),
+ 
     );
   }
 

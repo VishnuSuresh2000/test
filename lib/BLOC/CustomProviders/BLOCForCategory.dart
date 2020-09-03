@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:beru/BLOC/CustomProviders/BlocForFirbase.dart';
 import 'package:beru/CustomException/BeruException.dart';
 import 'package:beru/Schemas/BeruCategory.dart';
 import 'package:beru/Server/ServerApi.dart';
@@ -18,9 +19,17 @@ class BlocForCategory extends ChangeNotifier {
   StreamOutCategory data = StreamOutCategory();
   Stream _channel;
   StreamSubscription _sub;
+  FirebaseData _firebaseData = FirebaseData();
+
+  update(FirebaseData data) {
+    if (_firebaseData.state.toString() != data.state.toString()) {
+      print("Data State Changed ${_firebaseData.state} ${data.state}");
+      _firebaseData = data;
+      setData();
+    }
+  }
 
   BlocForCategory() : super() {
-    setData();
     webSocketControl();
   }
 

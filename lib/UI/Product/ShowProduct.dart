@@ -11,24 +11,44 @@ import 'package:beru/UI/CommonFunctions/BeruErrorPage.dart';
 import 'package:beru/UI/CommonFunctions/BeruLodingBar.dart';
 import 'package:beru/UI/Home/BeruSerach.dart';
 import 'package:beru/UI/Home/ShowCartButton.dart';
+import 'package:beru/UI/Login/checkUserStatus.dart';
 import 'package:beru/UI/Product/Counter.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:tuple/tuple.dart';
 import 'package:velocity_x/velocity_x.dart';
 
-class ShowProducts extends StatefulWidget {
+class ShowProducts extends StatelessWidget {
   static const String route = "/showProduct";
+  final scaffoldKey = GlobalKey<ScaffoldState>();
   @override
-  _ShowProductsState createState() => _ShowProductsState();
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Theme.of(context).backgroundColor,
+      key: scaffoldKey,
+      body: CheckUserStatus(
+        child: _ShowProducts(
+          scaffoldKey: scaffoldKey,
+        ),
+      ),
+    );
+  }
 }
 
-class _ShowProductsState extends State<ShowProducts>
+class _ShowProducts extends StatefulWidget {
+  final GlobalKey<ScaffoldState> scaffoldKey;
+
+  const _ShowProducts({Key key, this.scaffoldKey}) : super(key: key);
+  @override
+  __ShowProductsState createState() => __ShowProductsState();
+}
+
+class __ShowProductsState extends State<_ShowProducts>
     with SingleTickerProviderStateMixin {
   BeruCategory category;
   TabController _tabController;
   BlocForCategory blocForCategory;
-  final _scafoldKey = GlobalKey<ScaffoldState>();
+
   bool _isSnackbarActive = false;
   @override
   void initState() {
@@ -63,120 +83,109 @@ class _ShowProductsState extends State<ShowProducts>
               ?.indexWhere((element) => element.id == category.id) ??
           -1 + 1;
     }
-    return Scaffold(
-      key: _scafoldKey,
-      backgroundColor: Theme.of(context).backgroundColor,
-      body: Stack(
-        children: [
-          CustomScrollView(
-            slivers: [
-              SliverAppBar(
-                pinned: true,
-                title: "Beru Community".text.make(),
-                actions: [ShowCartButton()],
-                collapsedHeight: 100,
-                // expandedHeight: 150,
-                flexibleSpace: Align(
-                  alignment: Alignment.bottomCenter,
-                  child: Padding(
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 20, vertical: 20)
-                            .add(EdgeInsets.only(bottom: 35)),
-                    child: BeruSearchBar(),
-                  ),
-                ),
-                bottom: TabBar(
-                    controller: _tabController,
-                    isScrollable: true,
-                    tabs: blocForCategory.data.list
-                        .map((e) => Tab(
-                              child: e.name.firstLetterUpperCase().text.make(),
-                            ))
-                        .toList()),
-              ),
-              SliverToBoxAdapter(
+    return Stack(
+      children: [
+        CustomScrollView(
+          slivers: [
+            SliverAppBar(
+              pinned: true,
+              title: "Beru Community".text.make(),
+              actions: [ShowCartButton()],
+              collapsedHeight: 100,
+              // expandedHeight: 150,
+              flexibleSpace: Align(
+                alignment: Alignment.bottomCenter,
                 child: Padding(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 20
-                  ),
-                  child: Divider(
-                    color: Color(0xff707070),
-                    thickness: 0.3,
-                  ),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 20, vertical: 20)
+                          .add(EdgeInsets.only(bottom: 35)),
+                  child: BeruSearchBar(),
                 ),
               ),
-              if (products?.hasError == null && products?.data == null)
-                SliverToBoxAdapter(
-                  child: beruLoadingBar(),
+              bottom: TabBar(
+                  controller: _tabController,
+                  isScrollable: true,
+                  tabs: blocForCategory.data.list
+                      .map((e) => Tab(
+                            child: e.name.firstLetterUpperCase().text.make(),
+                          ))
+                      .toList()),
+            ),
+            SliverToBoxAdapter(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 20),
+                child: Divider(
+                  color: Color(0xff707070),
+                  thickness: 0.3,
                 ),
-              if (products?.hasError != null &&
-                  products.hasError &&
-                  products?.error != null)
+              ),
+            ),
+            if (products?.hasError == null && products?.data == null)
+              SliverToBoxAdapter(
+                child: beruLoadingBar(),
+              ),
+            if (products?.hasError != null &&
+                products.hasError &&
+                products?.error != null)
+              SliverToBoxAdapter(
+                child: BeruErrorPage(
+                  errMsg: products.error.toString(),
+                ),
+              ),
+            if (products?.hasError != null &&
+                !products.hasError &&
+                products?.data != null)
+              if (_showProduct.isEmpty)
                 SliverToBoxAdapter(
                   child: BeruErrorPage(
-                    errMsg: products.error.toString(),
+                    errMsg: BeruNoProductForSalles().toString(),
                   ),
-                ),
-              if (products?.hasError != null &&
-                  !products.hasError &&
-                  products?.data != null)
-                if (_showProduct.isEmpty)
-                  SliverToBoxAdapter(
-                    child: BeruErrorPage(
-                      errMsg: BeruNoProductForSalles().toString(),
-                    ),
-                  )
-                else
-                  SliverPadding(
-                    padding: EdgeInsets.symmetric(horizontal: 10, vertical: 10)
-                        .add(EdgeInsets.only(
-                            bottom: context.select<BlocForAddToBag, bool>(
-                                    (value) => value.toBuildAddToBag())
-                                ? 70
-                                : 0)),
-                    sliver: SliverGrid.count(
-                      crossAxisCount: context.isMobile ? 2 : 6,
-                      crossAxisSpacing: 10,
-                      mainAxisSpacing: 10,
-                      childAspectRatio: 0.8,
-                      children:
-                          _showProduct.map((e) => showProduct(e)).toList(),
-                    ),
-                  )
-            ],
-          ),
-          Selector<
-                  BlocForAddToBag,
-                  Tuple5<
-                      bool Function(),
-                      int Function(),
-                      List<double> Function(),
-                      double Function(),
-                      void Function(BuildContext)>>(
-              shouldRebuild: (previous, next) => true,
-              builder: (context, value, child) {
-                if (value.item1()) {
-                  return bottomBarAddToCart(value.item4(), value.item3(),
-                      value.item2(), value.item5, context);
-                } else {
-                  return Offstage();
-                }
-              },
-              selector: (_, handler) => Tuple5(
-                  handler.toBuildAddToBag,
-                  handler.getNumberOfiteams,
-                  handler.toWeightKg,
-                  handler.totalAmount,
-                  handler.addToBagInServer))
-        ],
-      ),
+                )
+              else
+                SliverPadding(
+                  padding: EdgeInsets.symmetric(horizontal: 10, vertical: 10)
+                      .add(EdgeInsets.only(
+                          bottom: context.select<BlocForAddToBag, bool>(
+                                  (value) => value.toBuildAddToBag())
+                              ? 70
+                              : 0)),
+                  sliver: SliverGrid.count(
+                    crossAxisCount: context.isMobile ? 2 : 6,
+                    crossAxisSpacing: 10,
+                    mainAxisSpacing: 10,
+                    childAspectRatio: 0.8,
+                    children: _showProduct.map((e) => showProduct(e)).toList(),
+                  ),
+                )
+          ],
+        ),
+        Selector<
+                BlocForAddToBag,
+                Tuple5<bool Function(), int Function(), List<double> Function(),
+                    double Function(), void Function(BuildContext)>>(
+            shouldRebuild: (previous, next) => true,
+            builder: (context, value, child) {
+              if (value.item1()) {
+                return bottomBarAddToCart(value.item4(), value.item3(),
+                    value.item2(), value.item5, context);
+              } else {
+                return Offstage();
+              }
+            },
+            selector: (_, handler) => Tuple5(
+                handler.toBuildAddToBag,
+                handler.getNumberOfiteams,
+                handler.toWeightKg,
+                handler.totalAmount,
+                handler.addToBagInServer))
+      ],
     );
   }
 
   showSnackBarOnPage(String content) {
     if (mounted) {
       _isSnackbarActive = true;
-      _scafoldKey.currentState
+      widget.scaffoldKey.currentState
           .showSnackBar(SnackBar(
               behavior: SnackBarBehavior.fixed,
               // margin: EdgeInsets.symmetric(

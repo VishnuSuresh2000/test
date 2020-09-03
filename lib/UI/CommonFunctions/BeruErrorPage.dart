@@ -12,7 +12,6 @@ class BeruErrorPage extends StatelessWidget {
         child: Container(
             color: Colors.white,
             child: "Error : $errMsg".text.red700.bold.make(),
-   
         ),
       ),
     );

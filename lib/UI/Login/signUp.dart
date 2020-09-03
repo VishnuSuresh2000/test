@@ -37,9 +37,7 @@ class _BeruSignUpState extends State<BeruSignUp> {
     print(
         "from build method ${_userState.user.firstName} ${_userState.user.lastName}");
 
-    return Scaffold(
-      backgroundColor: Colors.grey,
-      body: Center(
+    return  Center(
         child: Container(
           height: context.isMobile
               ? context.percentHeight * 100
@@ -164,7 +162,7 @@ class _BeruSignUpState extends State<BeruSignUp> {
             ),
           ),
         ),
-      ),
+
     );
   }
 

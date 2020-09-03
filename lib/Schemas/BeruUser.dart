@@ -1,5 +1,6 @@
 import 'package:beru/CustomFunctions/BeruString.dart';
 import 'package:beru/Schemas/address.dart';
+import 'package:velocity_x/velocity_x.dart';
 
 class BeruUser {
   String firstName;
@@ -10,7 +11,7 @@ class BeruUser {
   String _id;
   bool sex;
   String get fullName {
-    return "${firstToUpperCaseString(firstName)} ${firstToUpperCaseString(lastName ?? "")}";
+    return "${this.firstName?.firstLetterUpperCase()} ${this.lastName?.firstLetterUpperCase()}";
   }
 
   String get id {

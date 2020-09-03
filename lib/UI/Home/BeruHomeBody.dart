@@ -10,15 +10,11 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:velocity_x/velocity_x.dart';
 
-class BeruHomeBody extends StatefulWidget {
-  @override
-  _BeruHomeBodyState createState() => _BeruHomeBodyState();
-}
-
-class _BeruHomeBodyState extends State<BeruHomeBody> {
+class BeruHomeBody extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return nestedScrollView();
+    // print("calling build body");
+    return nestedScrollView(context);
   }
 
   Consumer getCategory(BuildContext context) {
@@ -95,59 +91,58 @@ class _BeruHomeBodyState extends State<BeruHomeBody> {
     );
   }
 
-  NestedScrollView nestedScrollView() {
-    return NestedScrollView(
-        headerSliverBuilder: (context, innerBoxIsScrolled) {
-          return [
-            SliverPadding(
-              sliver: SliverToBoxAdapter(
-                child: Card(
-                  child: SizedBox(
-                    width: double.infinity,
-                    height: 120,
-                    child: Carousel(
-                      images: [
-                        NetworkImage(
-                            'https://media.gettyimages.com/photos/colorful-fresh-organic-vegetables-picture-id882314812'),
-                        NetworkImage(
-                            'https://previews.123rf.com/images/puhhha/puhhha1805/puhhha180500313/100520940-healthy-food-fresh-organic-vegetables-on-white-wooden-background-high-resolution.jpg'),
-                        NetworkImage(
-                            'https://previews.123rf.com/images/puhhha/puhhha1805/puhhha180500313/100520940-healthy-food-fresh-organic-vegetables-on-white-wooden-background-high-resolution.jpg'),
-                        NetworkImage(
-                            'https://media.gettyimages.com/photos/colorful-fresh-organic-vegetables-picture-id882314812')
-                      ],
-                      dotSize: 4.0,
-                      dotSpacing: 15.0,
-                      dotColor: Colors.lightGreenAccent,
-                      indicatorBgPadding: 2.0,
-                      dotBgColor: Colors.transparent,
-                      dotPosition: DotPosition.bottomCenter,
-                      showIndicator: true,
-                      moveIndicatorFromBottom: 180.0,
-                      noRadiusForIndicator: true,
-                    ),
-                  ),
-                ),
+  Widget nestedScrollView(BuildContext context) {
+    return SliverList(
+      delegate: SliverChildListDelegate([
+        Padding(
+          child: Card(
+            child: SizedBox(
+              width: double.infinity,
+              height: 120,
+              child: Carousel(
+                images: [
+                  NetworkImage(
+                      'https://media.gettyimages.com/photos/colorful-fresh-organic-vegetables-picture-id882314812'),
+                  NetworkImage(
+                      'https://previews.123rf.com/images/puhhha/puhhha1805/puhhha180500313/100520940-healthy-food-fresh-organic-vegetables-on-white-wooden-background-high-resolution.jpg'),
+                  NetworkImage(
+                      'https://previews.123rf.com/images/puhhha/puhhha1805/puhhha180500313/100520940-healthy-food-fresh-organic-vegetables-on-white-wooden-background-high-resolution.jpg'),
+                  NetworkImage(
+                      'https://media.gettyimages.com/photos/colorful-fresh-organic-vegetables-picture-id882314812')
+                ],
+                dotSize: 4.0,
+                dotSpacing: 15.0,
+                dotColor: Colors.lightGreenAccent,
+                indicatorBgPadding: 2.0,
+                dotBgColor: Colors.transparent,
+                dotPosition: DotPosition.bottomCenter,
+                showIndicator: true,
+                moveIndicatorFromBottom: 180.0,
+                noRadiusForIndicator: true,
               ),
-              padding: EdgeInsets.symmetric(horizontal: 5),
             ),
-            SliverPadding(
-              sliver: SliverToBoxAdapter(
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text('Shop by category',
-                        style: Theme.of(context).textTheme.bodyText1),
-                    Text('View all',
-                        style: Theme.of(context).textTheme.bodyText1.copyWith(
-                            fontSize: 8, fontWeight: FontWeight.normal)),
-                  ],
-                ),
-              ),
-              padding: EdgeInsets.symmetric(horizontal: 20, vertical: 20),
-            )
-          ];
-        },
-        body: getCategory(context));
+          ),
+          padding: EdgeInsets.symmetric(horizontal: 5),
+        ),
+        Padding(
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text('Shop by category',
+                  style: Theme.of(context).textTheme.bodyText1),
+              Text('View all',
+                  style: Theme.of(context)
+                      .textTheme
+                      .bodyText1
+                      .copyWith(fontSize: 8, fontWeight: FontWeight.normal)),
+            ],
+          ),
+          padding: EdgeInsets.symmetric(horizontal: 20, vertical: 20),
+        ),
+        SingleChildScrollView(
+          child: getCategory(context),
+        )
+      ]),
+    );
   }
 }

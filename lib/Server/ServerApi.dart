@@ -31,12 +31,13 @@ class ServerApi {
     }
   }
 
-  static Future<bool> serverCheckIfExist() async {
+  static Future<Map<String, bool>> serverCheckIfExist() async {
     try {
       var head = "Bearer ${await tokenForServer()}";
       Response res = await _client.get('/customer/checkForExist',
           options: Options(headers: {"authorization": head}));
-      return res.data['data'];
+      print("data from server  serverCheckIfExist ${res.data['data']}");
+      return Map.from(res.data['data']);
     } on NoUserException catch (e) {
       print(e.errMsg().toString() + " custom error");
       throw e;
@@ -48,7 +49,7 @@ class ServerApi {
         throw BeruUnKnownError(error: e.response.data['data'].toString());
       }
     } catch (e) {
-      print(e);
+      print("error from  serverCheckIfExist $e");
       throw e;
     }
   }
@@ -185,6 +186,26 @@ class ServerApi {
           options: Options(
               headers: {"authorization": "Bearer ${await tokenForServer()}"}),
           data: json.encode(carts.map((e) => e.toMapCreate()).toList()));
+      print("serverGetCart data : ${res?.data}");
+      return res.data['data'];
+    } on DioError catch (e) {
+      print(e.response.data['data'].toString() + " dio error");
+      throw BeruUnKnownError(error: e.response.data['data'].toString());
+    } on TimeoutException {
+      throw BeruServerError();
+    } catch (e) {
+      print(e);
+      throw e;
+    }
+  }
+
+  static Future<Map<String, dynamic>> conformDelivary() async {
+    try {
+      Response res = await _client.put(
+        '/customer/cart/addMultiPayment',
+        options: Options(
+            headers: {"authorization": "Bearer ${await tokenForServer()}"}),
+      );
       print("serverGetCart data : ${res?.data}");
       return res.data['data'];
     } on DioError catch (e) {

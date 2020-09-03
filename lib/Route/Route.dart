@@ -1,6 +1,6 @@
+import 'package:beru/UI/Cart/ShowProductInCart.dart';
 import 'package:beru/UI/Home/BeruHome.dart';
 import 'package:beru/UI/InterNetConectivity/NoInterNet.dart';
-import 'package:beru/UI/Login/checkUserStatus.dart';
 import 'package:beru/UI/Product/ShowProduct.dart';
 import 'package:beru/UI/Profile/BeruProfileView.dart';
 import 'package:flutter/material.dart';
@@ -11,9 +11,9 @@ transitionOnRoute(RouteSettings settings) {
     case BeruHome.route:
       return defalutTransition(BeruHome(), settings);
       break;
-    case CheckUserStatus.route:
-      return defalutTransition(CheckUserStatus(), settings);
-      break;
+    // case CheckUserStatus.route:
+    //   return defalutTransition(CheckUserStatus(), settings);
+    // break;
     case NoInterNet.route:
       return defalutTransition(NoInterNet(), settings);
       break;
@@ -22,6 +22,9 @@ transitionOnRoute(RouteSettings settings) {
       break;
     case BeruProfile.route:
       return defalutTransition(BeruProfile(), settings);
+      break;
+    case ShowProductsInCart.route:
+      return defalutTransition(ShowProductsInCart(), settings);
       break;
   }
 }

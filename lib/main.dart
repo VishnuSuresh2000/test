@@ -1,13 +1,10 @@
 import 'dart:io';
-
 import 'package:beru/BLOC/BlocList.dart';
 import 'package:beru/Route/Route.dart';
 import 'package:beru/Server/ServerApi.dart';
 import 'package:beru/Server/ServerWebSocket.dart';
 import 'package:beru/Theme/DefaultTheme.dart';
-import 'package:beru/UI/CommonFunctions/BeruErrorPage.dart';
-import 'package:beru/UI/CommonFunctions/BeruLodingBar.dart';
-import 'package:beru/UI/InterNetConectivity/InitalCheck.dart';
+import 'package:beru/UI/Home/BeruHome.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -25,39 +22,9 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  bool _initialized = false;
-  bool _error = false;
-  Exception _errorOnInitFirebase;
-
-  // Define an async function to initialize FlutterFire
-  void initializeFlutterFire() async {
-    try {
-      await Firebase.initializeApp();
-      setState(() {
-        _initialized = true;
-      });
-    } catch (e) {
-      setState(() {
-        _error = true;
-        _errorOnInitFirebase = e;
-      });
-    }
-  }
-
-  Widget checkFirebaseInIt() {
-    if (_error) {
-      return BeruErrorPage(errMsg: _errorOnInitFirebase.toString());
-    }
-    if (!_initialized) {
-      return beruLoadingBar();
-    }
-    return InitalCheck();
-  }
-
   @override
   void initState() {
-    initializeFlutterFire();
-    ServerApi.offlineOnline = false;
+    ServerApi.offlineOnline = true;
     ServerSocket.serverSocket();
     super.initState();
   }
@@ -77,7 +44,8 @@ class _MyAppState extends State<MyApp> {
         theme: defaultTheme,
         onGenerateRoute: (settings) => transitionOnRoute(settings),
         debugShowCheckedModeBanner: false,
-        home: checkFirebaseInIt(),
+        // home: BeruHome(),
+        initialRoute: BeruHome.route,
       ),
     );
   }

@@ -20,11 +20,12 @@ ThemeData defaultTheme = ThemeData(
           fontFamily: 'SourceSansPro',
           fontSize: 20.0,
         ),
-        // subtitle1: TextStyle(
-        //   color: Colors.redAccent,
-        //   fontFamily: 'SourceSansPro',
-        //   fontSize: 20.0,
-        // ),
+        subtitle1: TextStyle(
+          color: Color(0xff979797),
+          fontFamily: GoogleFonts.roboto().fontFamily,
+          fontSize: 8,
+          fontWeight: FontWeight.w300
+        ),
         headline1: TextStyle(
           color: Colors.blueAccent,
           fontFamily: 'SourceSansPro',
