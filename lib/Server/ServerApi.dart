@@ -15,7 +15,7 @@ class ServerApi {
   static bool offlineOnline = false;
   static String switchWeb = kIsWeb ? "localhost:80" : "192.168.43.144:80";
   static String dns =
-      offlineOnline ? "$switchWeb" : "beru-server.herokuapp.com";
+      offlineOnline ? "$switchWeb" : "api.beru.co.in";
   static String url = offlineOnline ? "http://$dns" : "https://$dns";
   static BaseOptions _options = BaseOptions(
     baseUrl: url,

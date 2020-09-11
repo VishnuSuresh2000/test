@@ -67269,7 +67269,7 @@ s($,"aDn","ag_",function(){return new P.CP(P.D(t.N,H.ah("Ak<mh>?")))})
 s($,"aDC","aiU",function(){return new P.a0C(P.D(t.N,H.ah("aG(i)")),P.D(t.S,t.h))})
 r($,"aDm","aqt",function(){var q=null,p=t.gi,o=H.ah("dM*"),n=t.Ff
 return H.c([Q.ahr(q,new T.aeL(),p),T.SL(new T.aeM(),new T.aeN(),p,o),T.SL(new T.aeY(),new T.af_(),o,t.WJ),new Q.nR(new Y.oy(M.asM().gmC(),q,Q.anO(q,q,p),H.ah("oy<aE<bT*>*,bT*>")),q,q,q,q,H.ah("nR<bT*>")),T.SL(new T.af0(),new T.af1(),o,t.ZE),T.ajB(q,new T.af2(),t.dH),Q.ahr(new T.af3(),new T.af4(),t.rX),Q.ahr(new T.af5(),new T.aeO(),n),T.SL(new T.aeP(),new T.aeQ(),n,t.wG)],H.ah("w<cG*>"))})
-r($,"aBJ","Q_",function(){return $.Ib?"localhost:80":"beru-server.herokuapp.com"})
+r($,"aBJ","Q_",function(){return $.Ib?"localhost:80":"api.beru.co.in"})
 r($,"aBK","BP",function(){return $.Ib?"http://"+$.Q_():"https://"+$.Q_()})
 r($,"aBI","apt",function(){return B.ajm($.BP(),3000)})
 r($,"aBH","jg",function(){var q=null,p=$.apt(),o=new U.U7(q,new L.EZ(H.c([],H.ah("w<is*>")),new L.vQ(),new L.vQ(),new L.vQ()),q,new Q.TX(),!1)

@@ -40,7 +40,7 @@ android {
 
     defaultConfig {
         // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
-        applicationId "com.example.beru"
+        applicationId "in.co.beru.customer"
         minSdkVersion 16
         targetSdkVersion 28
         multiDexEnabled true
