@@ -37,6 +37,9 @@ class BlocForCategory extends ChangeNotifier {
     try {
       data.list = await ServerApi.serverGetCategory();
       data.isError = false;
+    } on BeruNoProductForSalles {
+      data.error = BeruNoProductForSalles();
+      data.isError = true;
     } catch (e) {
       print("From setData error $e");
       if (data.loading) {
@@ -45,7 +48,7 @@ class BlocForCategory extends ChangeNotifier {
       data.error = BeruServerError();
     } finally {
       data.loading = false;
-      if (data.isError) {
+      if (data.isError && !(data.error is BeruNoProductForSalles)) {
         print("called the State from Cat");
         setData();
       }

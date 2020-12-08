@@ -220,7 +220,7 @@ class ServerApi {
   }
 
   static Future<List<Cart>> serverGetCart() async {
-    print("on the server call of product");
+    print("on the server call of Cart");
     try {
       Response res = await _client.get('/customer/cart/data',
           options: Options(

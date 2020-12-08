@@ -22,5 +22,5 @@ class BeruUnKnownError implements Exception {
 }
 
 class BeruNoProductForSalles implements Exception {
-  String toString() => "No Product Is Available For this Category";
+  String toString() => "No Product Is Available";
 }
